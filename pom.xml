@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.bigdata.janusgraph</groupId>
+    <artifactId>janusgraph-util</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java-version>1.8</java-version>
+        <janusgraph-version>0.2.0</janusgraph-version>
+        <commons.lang3.version>3.3.1</commons.lang3.version>
+    </properties>
+
+    <modules>
+        <module>janusgraph-import</module>
+    </modules>
+
+    <dependencyManagement>
+
+        <dependencies>
+
+            <dependency>
+                <groupId>org.apache.tinkerpop</groupId>
+                <artifactId>gremlin-driver</artifactId>
+                <version>3.3.3</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.janusgraph</groupId>
+                <artifactId>janusgraph-core</artifactId>
+                <version>${janusgraph-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.janusgraph</groupId>
+                <artifactId>janusgraph-cassandra</artifactId>
+                <version>${janusgraph-version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.janusgraph</groupId>
+                <artifactId>janusgraph-berkeleyje</artifactId>
+                <version>${janusgraph-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.janusgraph</groupId>
+                <artifactId>janusgraph-es</artifactId>
+                <version>${janusgraph-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.janusgraph</groupId>
+                <artifactId>janusgraph-hadoop-core</artifactId>
+                <version>${janusgraph-version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.janusgraph</groupId>
+                        <artifactId>janusgraph-hbase-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>
