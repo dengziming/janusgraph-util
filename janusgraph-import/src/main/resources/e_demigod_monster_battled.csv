@@ -1,0 +1,4 @@
+:START_ID(demigod),:END_ID(monster),time:Int,place
+hercules,nemean,1,38.1f_23.7f
+hercules,hydra,2,37.7f_23.9f
+hercules,cerberus,12,39f_22f

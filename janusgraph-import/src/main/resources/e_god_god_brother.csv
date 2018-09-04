@@ -1,0 +1,7 @@
+:START_ID(god),:END_ID(god)
+jupiter,neptune
+jupiter,pluto
+neptune,jupiter
+neptune,pluto
+pluto,neptune
+pluto,jupiter
