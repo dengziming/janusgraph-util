@@ -341,7 +341,7 @@ public class EncodingIdMapper extends AbstractIdMapper<String> {
      * </ol>
      */
     @Override
-    public void prepare(LongFunction<Object> inputIdLookup, Collector collector, ProgressListener progress ) throws Exception {
+    public void prepare(LongFunction<String> inputIdLookup, Collector collector, ProgressListener progress ) throws Exception {
         highestSetIndex = candidateHighestSetIndex.get();
         updateRadix( dataCache, radix, highestSetIndex );
         trackerCache = trackerFactory.create( cacheFactory, highestSetIndex + 1 );
@@ -637,7 +637,7 @@ public class EncodingIdMapper extends AbstractIdMapper<String> {
         return COLLISION_BIT.get( eId, 1 ) != 0;
     }
 
-    private void buildCollisionInfo( LongFunction<Object> inputIdLookup, long pessimisticNumberOfCollisions,
+    private void buildCollisionInfo( LongFunction<String> inputIdLookup, long pessimisticNumberOfCollisions,
                                      Collector collector, ProgressListener progress )
             throws Exception
     {

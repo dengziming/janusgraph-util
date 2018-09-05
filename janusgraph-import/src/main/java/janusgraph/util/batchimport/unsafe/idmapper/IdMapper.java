@@ -35,7 +35,7 @@ public interface IdMapper<T> extends MemoryStatsVisitor.Visitable{
      * @param collector {@link Collector} for bad entries, such as duplicate node ids.
      * @param progress reports preparation progress.
      */
-    void prepare(LongFunction<Object> inputIdLookup, Collector collector, ProgressListener progress) throws Exception;
+    void prepare(LongFunction<T> inputIdLookup, Collector collector, ProgressListener progress) throws Exception;
 
     public void close();
 

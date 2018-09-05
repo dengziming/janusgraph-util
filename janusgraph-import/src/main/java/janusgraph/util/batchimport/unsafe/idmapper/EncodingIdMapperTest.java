@@ -1,22 +1,3 @@
-/*
- * Copyright (c) 2002-2018 "Neo Technology,"
- * Network Engine for Objects in Lund AB [http://neotechnology.com]
- *
- * This file is part of Neo4j.
- *
- * Neo4j is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package janusgraph.util.batchimport.unsafe.idmapper;
 
 import janusgraph.util.batchimport.unsafe.helps.Factory;
@@ -62,8 +43,8 @@ public class EncodingIdMapperTest
     public void shouldHandleGreatAmountsOfStuff() throws Exception
     {
         // GIVEN
-        IdMapper idMapper = mapper( new StringEncoder(), Radix.STRING, NO_MONITOR );
-        LongFunction<Object> inputIdLookup = String::valueOf;
+        IdMapper<String> idMapper = mapper( new StringEncoder(), Radix.STRING, NO_MONITOR );
+        LongFunction<String> inputIdLookup = String::valueOf;
         int count = 1_000_000_000;
 //        int count = 100_000;
 
@@ -84,7 +65,7 @@ public class EncodingIdMapperTest
         for ( long nodeId = 0; nodeId < count; nodeId++ )
         {
             // the UUIDs here will be generated in the same sequence as above because we reset the random
-            Object id = inputIdLookup.apply( nodeId );
+            String id = inputIdLookup.apply( nodeId );
             if ( idMapper.get( id, GLOBAL ) >> (12) == ID_NOT_FOUND )
             {
                 fail();
@@ -103,24 +84,19 @@ public class EncodingIdMapperTest
     private void fail(){
         fails ++;
     }
-    
 
-    private LongFunction<Object> values( Object... values )
-    {
-        return value -> values[toIntExact( value )];
-    }
 
-    private IdMapper mapper(Encoder encoder, Factory<Radix> radix, EncodingIdMapper.Monitor monitor )
+    private IdMapper<String> mapper(Encoder<String> encoder, Factory<Radix> radix, EncodingIdMapper.Monitor monitor )
     {
         return mapper( encoder, radix, monitor, ParallelSort.DEFAULT );
     }
 
-    private IdMapper mapper( Encoder encoder, Factory<Radix> radix, EncodingIdMapper.Monitor monitor, ParallelSort.Comparator comparator )
+    private IdMapper<String> mapper( Encoder<String> encoder, Factory<Radix> radix, EncodingIdMapper.Monitor monitor, ParallelSort.Comparator comparator )
     {
         return mapper( encoder, radix, monitor, comparator, autoDetect( encoder ) );
     }
 
-    private IdMapper mapper( Encoder encoder, Factory<Radix> radix, EncodingIdMapper.Monitor monitor, ParallelSort.Comparator comparator,
+    private IdMapper<String> mapper( Encoder<String> encoder, Factory<Radix> radix, EncodingIdMapper.Monitor monitor, ParallelSort.Comparator comparator,
             LongFunction<CollisionValues> collisionValuesFactory )
     {
         return new EncodingIdMapper( NumberArrayFactory.OFF_HEAP, encoder, radix, monitor, BigId_TRACKER_FACTORY, groups,
