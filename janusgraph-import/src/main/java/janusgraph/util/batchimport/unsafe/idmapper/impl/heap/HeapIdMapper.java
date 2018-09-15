@@ -1,4 +1,4 @@
-package janusgraph.util.batchimport.unsafe.idmapper.impl.simple;
+package janusgraph.util.batchimport.unsafe.idmapper.impl.heap;
 
 import janusgraph.util.batchimport.unsafe.helps.collection.PrimitiveLongIterator;
 import janusgraph.util.batchimport.unsafe.idmapper.cache.MemoryStatsVisitor;
@@ -12,14 +12,13 @@ import java.util.Map;
 import java.util.function.LongFunction;
 
 /**
- * Created by dengziming on 15/08/2018.
- * ${Main}
+ * head mapper
  */
-public class MapIdMapper<T> extends AbstractIdMapper<T> {
+public class HeapIdMapper<T> extends AbstractIdMapper<T> {
 
     private Map<Group, Map<T,Long>> idContainer ;
 
-    public MapIdMapper(){
+    public HeapIdMapper(){
         idContainer = new HashMap<>();
     }
 
@@ -44,7 +43,7 @@ public class MapIdMapper<T> extends AbstractIdMapper<T> {
     }
 
     @Override
-    public void prepare(LongFunction<Object> inputIdLookup, Collector collector, ProgressListener progress) {
+    public void prepare(LongFunction<T> inputIdLookup, Collector collector, ProgressListener progress) {
         // ignore
     }
 

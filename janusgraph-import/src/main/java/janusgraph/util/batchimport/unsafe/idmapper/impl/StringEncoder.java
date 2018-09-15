@@ -7,7 +7,6 @@ import java.util.Arrays;
 import static java.lang.Math.max;
 
 /**
- * Created by dengziming on 15/08/2018.
  * Encodes String into a long with very small chance of collision, i.e. two different Strings encoded into
  * the same long value.
  *

@@ -1,8 +1,6 @@
 package janusgraph.util.batchimport.unsafe.idmapper.cache;
 
 /**
- * Created by dengziming on 15/08/2018.
- * ${Main}
  * Abstraction of a {@code byte[]} so that different implementations can be plugged in, for example
  * off-heap, dynamically growing, or other implementations. This interface is slightly different than
  * {@link IntArray} and {@link LongArray} in that one index in the array isn't necessarily just a byte,
