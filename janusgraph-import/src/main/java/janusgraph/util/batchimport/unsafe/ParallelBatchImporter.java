@@ -69,12 +69,10 @@ public class ParallelBatchImporter extends LifecycleAdapter implements BatchImpo
             long time2 = System.currentTimeMillis();
             logic.prepareIdMapper();
             long time3 = System.currentTimeMillis();
-            logic.importRelationships();
+            logic.importEdges();
             long time4 = System.currentTimeMillis();
-            System.out.println("[node]" + (time2 - time1) + "[map]" + (time3 - time2) + "[relation]" + (time4 - time3)) ;
+            System.out.println("[node]" + (time2 - time1) + "[map]" + (time3 - time2) + "[edge]" + (time4 - time3)) ;
             /*logic.calculateNodeDegrees();
-            logic.linkRelationshipsOfAllTypes();
-            logic.defragmentRelationshipGroups();
             logic.buildCountsStore();*/
         }
     }

@@ -6,7 +6,7 @@ package janusgraph.util.batchimport.unsafe.input;
  */
 public interface Collector extends AutoCloseable
 {
-    void collectBadRelationship(
+    void collectBadEdge(
             Object startId, String startIdGroup, String type,
             Object endId, String endIdGroup, Object specificValue) throws Exception;
 
@@ -16,7 +16,7 @@ public interface Collector extends AutoCloseable
 
     long badEntries();
 
-    boolean isCollectingBadRelationships();
+    boolean isCollectingBadEdges();
 
     /**
      * Flushes whatever changes to the underlying resource supplied from the importer.
@@ -43,8 +43,8 @@ public interface Collector extends AutoCloseable
         }
 
         @Override
-        public void collectBadRelationship( Object startId, String startIdGroup, String type, Object endId, String endIdGroup,
-                Object specificValue )
+        public void collectBadEdge(Object startId, String startIdGroup, String type, Object endId, String endIdGroup,
+                                   Object specificValue )
         {
         }
 
@@ -54,7 +54,7 @@ public interface Collector extends AutoCloseable
         }
 
         @Override
-        public boolean isCollectingBadRelationships()
+        public boolean isCollectingBadEdges()
         {
             return true;
         }

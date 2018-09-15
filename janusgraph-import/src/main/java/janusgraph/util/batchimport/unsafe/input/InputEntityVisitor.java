@@ -32,7 +32,7 @@ public interface InputEntityVisitor extends Closeable
 
     boolean labelField(long labelField);
 
-    // For relationships
+    // For edges
     boolean startId(long id);
 
     boolean startId(Object id, Group group);

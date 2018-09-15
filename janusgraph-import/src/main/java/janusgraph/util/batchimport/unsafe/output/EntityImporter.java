@@ -139,7 +139,7 @@ public abstract class EntityImporter extends InputEntityVisitor.Adapter {
     public static class Monitor
     {
         private final LongAdder nodes = new LongAdder();
-        private final LongAdder relationships = new LongAdder();
+        private final LongAdder edges = new LongAdder();
         private final LongAdder properties = new LongAdder();
 
         public void nodesImported( long nodes )
@@ -152,9 +152,9 @@ public abstract class EntityImporter extends InputEntityVisitor.Adapter {
             this.nodes.add( -nodes );
         }
 
-        public void relationshipsImported( long relationships )
+        public void edgesImported(long edges )
         {
-            this.relationships.add( relationships );
+            this.edges.add( edges );
         }
 
         public void propertiesImported( long properties )
@@ -177,16 +177,16 @@ public abstract class EntityImporter extends InputEntityVisitor.Adapter {
             return this.properties.sum();
         }
 
-        public long relationshipsImported()
+        public long edgesImported()
         {
-            return this.relationships.sum();
+            return this.edges.sum();
         }
 
         @Override
         public String toString()
         {
-            return format( "Imported:%n  %d nodes%n  %d relationships%n  %d properties",
-                    nodes.sum(), relationships.sum(), properties.sum() );
+            return format( "Imported:%n  %d nodes%n  %d edges%n  %d properties",
+                    nodes.sum(), edges.sum(), properties.sum() );
         }
     }
 

@@ -12,17 +12,17 @@ import static java.lang.Integer.max;
 import static java.lang.String.format;
 
 /**
- * Keeps data about how relationships are distributed between different types.
+ * Keeps data about how edges are distributed between different types.
  */
-public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeCount>
+public class DataStatistics implements Iterable<DataStatistics.EdgeTypeCount>
 {
     private final List<Client> clients = new ArrayList<>();
     private int opened;
-    private RelationshipTypeCount[] typeCounts;
+    private EdgeTypeCount[] typeCounts;
     private final long nodeCount;
     private final long propertyCount;
 
-    public DataStatistics(long nodeCount, long propertyCount, RelationshipTypeCount[] sortedTypes )
+    public DataStatistics(long nodeCount, long propertyCount, EdgeTypeCount[] sortedTypes )
     {
         this.nodeCount = nodeCount;
         this.propertyCount = propertyCount;
@@ -30,12 +30,12 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
     }
 
     @Override
-    public Iterator<RelationshipTypeCount> iterator()
+    public Iterator<EdgeTypeCount> iterator()
     {
         return Iterators.iterator( typeCounts );
     }
 
-    public int getNumberOfRelationshipTypes()
+    public int getNumberOfEdgeTypes()
     {
         return typeCounts.length;
     }
@@ -63,21 +63,21 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
             {
                 client.addTo( counts );
             }
-            typeCounts = new RelationshipTypeCount[counts.length];
+            typeCounts = new EdgeTypeCount[counts.length];
             for ( int i = 0; i < counts.length; i++ )
             {
-                typeCounts[i] = new RelationshipTypeCount( i, counts[i] );
+                typeCounts[i] = new EdgeTypeCount( i, counts[i] );
             }
             Arrays.sort( typeCounts );
         }
     }
 
-    public static class RelationshipTypeCount implements Comparable<RelationshipTypeCount>
+    public static class EdgeTypeCount implements Comparable<EdgeTypeCount>
     {
         private final int typeId;
         private final long count;
 
-        public RelationshipTypeCount( int typeId, long count )
+        public EdgeTypeCount(int typeId, long count )
         {
             this.typeId = typeId;
             this.count = count;
@@ -94,7 +94,7 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
         }
 
         @Override
-        public int compareTo( RelationshipTypeCount o )
+        public int compareTo( EdgeTypeCount o )
         {
             return Long.compare( count, o.count );
         }
@@ -120,7 +120,7 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
             {
                 return false;
             }
-            RelationshipTypeCount other = (RelationshipTypeCount) obj;
+            EdgeTypeCount other = (EdgeTypeCount) obj;
             return count == other.count && typeId == other.typeId;
         }
 
@@ -133,7 +133,7 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
 
     public class Client implements AutoCloseable
     {
-        private long[] counts = new long[8]; // index is relationship type id
+        private long[] counts = new long[8]; // index is edgeLabel id
         private int highestTypeId;
 
         public void increment( int typeId )
@@ -164,7 +164,7 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
         }
     }
 
-    public RelationshipTypeCount get( int index )
+    public EdgeTypeCount get(int index )
     {
         return typeCounts[index];
     }
@@ -189,10 +189,10 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
         return propertyCount;
     }
 
-    public long getRelationshipCount()
+    public long getEdgeCount()
     {
         long sum = 0;
-        for ( RelationshipTypeCount type : typeCounts )
+        for ( EdgeTypeCount type : typeCounts )
         {
             sum += type.count;
         }
@@ -202,6 +202,6 @@ public class DataStatistics implements Iterable<DataStatistics.RelationshipTypeC
     @Override
     public String toString()
     {
-        return format( "Imported:%n  %d nodes%n  %d relationships%n  %d properties", nodeCount, getRelationshipCount(), propertyCount );
+        return format( "Imported:%n  %d nodes%n  %d edges%n  %d properties", nodeCount, getEdgeCount(), propertyCount );
     }
 }

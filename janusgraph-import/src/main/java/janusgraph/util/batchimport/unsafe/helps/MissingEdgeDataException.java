@@ -3,11 +3,11 @@ package janusgraph.util.batchimport.unsafe.helps;
 
 import janusgraph.util.batchimport.unsafe.input.csv.Type;
 
-public class MissingRelationshipDataException extends DataException
+public class MissingEdgeDataException extends DataException
 {
     private Type fieldType;
 
-    public MissingRelationshipDataException(Type missedField, String message )
+    public MissingEdgeDataException(Type missedField, String message )
     {
         super( message );
         this.fieldType = missedField;

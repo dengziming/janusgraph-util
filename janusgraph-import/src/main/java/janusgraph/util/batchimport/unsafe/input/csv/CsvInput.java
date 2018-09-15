@@ -33,8 +33,8 @@ public class CsvInput implements Input
 
     private final Iterable<DataFactory> nodeDataFactory;
     private final Header.Factory nodeHeaderFactory;
-    private final Iterable<DataFactory> relationshipDataFactory;
-    private final Header.Factory relationshipHeaderFactory;
+    private final Iterable<DataFactory> edgeDataFactory;
+    private final Header.Factory edgeHeaderFactory;
     private final IdType idType;
     private final Configuration config;
     private final Collector badCollector;
@@ -45,34 +45,34 @@ public class CsvInput implements Input
      * specifies an input group with its own header, extracted by the {@code nodeHeaderFactory}. From the outside
      * it looks like one stream of nodes.
      * @param nodeHeaderFactory factory for reading node headers.
-     * @param relationshipDataFactory multiple {@link DataFactory} instances providing data, each {@link DataFactory}
-     * specifies an input group with its own header, extracted by the {@code relationshipHeaderFactory}.
-     * From the outside it looks like one stream of relationships.
-     * @param relationshipHeaderFactory factory for reading relationship headers.
-     * @param idType {@link IdType} to expect in id fields of node and relationship input.
+     * @param edgeDataFactory multiple {@link DataFactory} instances providing data, each {@link DataFactory}
+     * specifies an input group with its own header, extracted by the {@code edgeHeaderFactory}.
+     * From the outside it looks like one stream of edges.
+     * @param edgeHeaderFactory factory for reading edge headers.
+     * @param idType {@link IdType} to expect in id fields of node and edge input.
      * @param config CSV configuration.
      * @param badCollector Collector getting calls about bad input data.
      */
     public CsvInput(
             Iterable<DataFactory> nodeDataFactory, Header.Factory nodeHeaderFactory,
-            Iterable<DataFactory> relationshipDataFactory, Header.Factory relationshipHeaderFactory,
+            Iterable<DataFactory> edgeDataFactory, Header.Factory edgeHeaderFactory,
             IdType idType, Configuration config, Collector badCollector )
     {
-        this( nodeDataFactory, nodeHeaderFactory, relationshipDataFactory, relationshipHeaderFactory, idType, config, badCollector,
+        this( nodeDataFactory, nodeHeaderFactory, edgeDataFactory, edgeHeaderFactory, idType, config, badCollector,
                 new Groups() );
     }
 
     CsvInput(
             Iterable<DataFactory> nodeDataFactory, Header.Factory nodeHeaderFactory,
-            Iterable<DataFactory> relationshipDataFactory, Header.Factory relationshipHeaderFactory,
+            Iterable<DataFactory> edgeDataFactory, Header.Factory edgeHeaderFactory,
             IdType idType, Configuration config, Collector badCollector, Groups groups )
     {
         assertSaneConfiguration( config );
 
         this.nodeDataFactory = nodeDataFactory;
         this.nodeHeaderFactory = nodeHeaderFactory;
-        this.relationshipDataFactory = relationshipDataFactory;
-        this.relationshipHeaderFactory = relationshipHeaderFactory;
+        this.edgeDataFactory = edgeDataFactory;
+        this.edgeHeaderFactory = edgeHeaderFactory;
         this.idType = idType;
         this.config = config;
         this.badCollector = badCollector;
@@ -84,8 +84,8 @@ public class CsvInput implements Input
     /**
      * Verifies so that all headers in input files looks sane:
      * <ul>
-     * <li>node/relationship headers can be parsed correctly</li>
-     * <li>relationship headers uses ID spaces previously defined in node headers</li>
+     * <li>node/edge headers can be parsed correctly</li>
+     * <li>edge headers uses ID spaces previously defined in node headers</li>
      * </ul>
      */
     private void verifyHeaders()
@@ -104,14 +104,14 @@ public class CsvInput implements Input
                 }
             }
 
-            // parse all relationship headers and verify all ID spaces
-            for ( DataFactory dataFactory : relationshipDataFactory )
+            // parse all edge headers and verify all ID spaces
+            for ( DataFactory dataFactory : edgeDataFactory)
             {
                 try ( CharSeeker dataStream = CharSeekers.charSeeker( new MultiReadable( dataFactory.create( config ).stream() ), config, true ) )
                 {
                     // Merely parsing and constructing the header here will as a side-effect verify that the
-                    // id groups already exists (relationship header isn't allowed to create groups)
-                    Header header = relationshipHeaderFactory.create(dataStream, config, idType, groups);
+                    // id groups already exists (edge header isn't allowed to create groups)
+                    Header header = edgeHeaderFactory.create(dataStream, config, idType, groups);
                     GraphUtil.createSchema(header);
                 }
             }
@@ -147,9 +147,9 @@ public class CsvInput implements Input
     }
 
     @Override
-    public InputIterable relationships()
+    public InputIterable edges()
     {
-        return replayable( () -> stream( relationshipDataFactory, relationshipHeaderFactory ) );
+        return replayable( () -> stream(edgeDataFactory, edgeHeaderFactory) );
     }
 
     private InputIterator stream(Iterable<DataFactory> data, Header.Factory headerFactory )
@@ -173,11 +173,11 @@ public class CsvInput implements Input
     public Estimates calculateEstimates( ToIntFunction<Value[]> valueSizeCalculator ) throws Exception
     {
         long[] nodeSample = sample( nodeDataFactory, nodeHeaderFactory, valueSizeCalculator, node -> node.labels().length );
-        long[] relationshipSample = sample( relationshipDataFactory, relationshipHeaderFactory, valueSizeCalculator, entity -> 0 );
+        long[] edgeSample = sample(edgeDataFactory, edgeHeaderFactory, valueSizeCalculator, entity -> 0 );
         return Inputs.knownEstimates(
-                nodeSample[0], relationshipSample[0],
-                nodeSample[1], relationshipSample[1],
-                nodeSample[2], relationshipSample[2],
+                nodeSample[0], edgeSample[0],
+                nodeSample[1], edgeSample[1],
+                nodeSample[2], edgeSample[2],
                 nodeSample[3] );
     }
 

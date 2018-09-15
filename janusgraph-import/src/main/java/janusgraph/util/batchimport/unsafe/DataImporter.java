@@ -10,7 +10,7 @@ import janusgraph.util.batchimport.unsafe.io.IoMonitor;
 import janusgraph.util.batchimport.unsafe.io.IoTracer;
 import janusgraph.util.batchimport.unsafe.output.EntityImporter;
 import janusgraph.util.batchimport.unsafe.output.NodeImporter;
-import janusgraph.util.batchimport.unsafe.output.RelationshipImporter;
+import janusgraph.util.batchimport.unsafe.output.EdgeImporter;
 import janusgraph.util.batchimport.unsafe.stage.ExecutionMonitor;
 import janusgraph.util.batchimport.unsafe.stage.StageExecution;
 import janusgraph.util.batchimport.unsafe.stage.Step;
@@ -34,7 +34,7 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 
 /**
- * Imports data from {@link Input} into a store. Only linkage between property records is done, not between nodes/relationships
+ * Imports data from {@link Input} into a store. Only linkage between property records is done, not between nodes/edges
  * or any other types of records.
  *
  * Main design goal here is low garbage and letting multiple threads import with as little as possible shared between threads.
@@ -49,12 +49,12 @@ import static java.lang.System.currentTimeMillis;
 public class DataImporter
 {
     public static final String NODE_IMPORT_NAME = "Nodes";
-    public static final String RELATIONSHIP_IMPORT_NAME = "Relationships";
+    public static final String EDGE_IMPORT_NAME = "Edges";
 
     public static class Monitor
     {
         private final LongAdder nodes = new LongAdder();
-        private final LongAdder relationships = new LongAdder();
+        private final LongAdder edges = new LongAdder();
         private final LongAdder properties = new LongAdder();
 
         public void nodesImported( long nodes )
@@ -67,9 +67,9 @@ public class DataImporter
             this.nodes.add( -nodes );
         }
 
-        public void relationshipsImported( long relationships )
+        public void edgesImported(long edges )
         {
-            this.relationships.add( relationships );
+            this.edges.add( edges );
         }
 
         public void propertiesImported( long properties )
@@ -92,16 +92,16 @@ public class DataImporter
             return this.properties.sum();
         }
 
-        public long relationshipsImported()
+        public long edgesImported()
         {
-            return this.relationships.sum();
+            return this.edges.sum();
         }
 
         @Override
         public String toString()
         {
-            return format( "Imported:%n  %d nodes%n  %d relationships%n  %d properties",
-                    nodes.sum(), relationships.sum(), properties.sum() );
+            return format( "Imported:%n  %d nodes%n  %d edges%n  %d properties",
+                    nodes.sum(), edges.sum(), properties.sum() );
         }
     }
 
@@ -165,19 +165,19 @@ public class DataImporter
                 new MemoryUsageStatsProvider( idMapper ) );
     }
 
-    public static DataStatistics importRelationships(int numRunners, Input input,
-                                                     IdMapper<String> idMapper, Collector badCollector, ExecutionMonitor executionMonitor,
-                                                     Monitor monitor,
-                                                     StandardJanusGraph graph ,
-                                                     BulkIdAssigner idAssigner,
-                                                     ImportStore janusStore)
+    public static DataStatistics importEdges(int numRunners, Input input,
+                                             IdMapper<String> idMapper, Collector badCollector, ExecutionMonitor executionMonitor,
+                                             Monitor monitor,
+                                             StandardJanusGraph graph ,
+                                             BulkIdAssigner idAssigner,
+                                             ImportStore janusStore)
                     throws IOException
     {
         DataStatistics typeDistribution = new DataStatistics( monitor.nodes.sum(), monitor.properties.sum(),
-                new DataStatistics.RelationshipTypeCount[0] );
-        Function<Integer,EntityImporter> importers = (i) -> new RelationshipImporter(numRunners,i,RELATIONSHIP_IMPORT_NAME, idMapper, monitor,
+                new DataStatistics.EdgeTypeCount[0] );
+        Function<Integer,EntityImporter> importers = (i) -> new EdgeImporter(numRunners,i, EDGE_IMPORT_NAME, idMapper, monitor,
                 badCollector , graph , idAssigner,janusStore);
-        importData( RELATIONSHIP_IMPORT_NAME, numRunners, input.relationships(), importers, executionMonitor,
+        importData(EDGE_IMPORT_NAME, numRunners, input.edges(), importers, executionMonitor,
                 new MemoryUsageStatsProvider( idMapper ) );
         return typeDistribution;
     }

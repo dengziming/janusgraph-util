@@ -29,14 +29,14 @@ public class InputEntityDecorators
     }
 
     /**
-     * Ensures that input relationships without a specified relationship type will get
-     * the specified default relationship type.
+     * Ensures that input edges without a specified edgeLabel will get
+     * the specified default edgeLabel.
      */
-    public static Decorator defaultRelationshipType( final String defaultType )
+    public static Decorator defaultEdgeLabel(final String defaultType )
     {
         return defaultType == null
                 ? NO_DECORATOR
-                : relationship -> new RelationshipTypeDecorator( relationship, defaultType );
+                : edge -> new EdgeLabelDecorator( edge, defaultType );
     }
 
     private static final class AdditiveLabelsDecorator extends InputEntityVisitor.Delegate
@@ -100,12 +100,12 @@ public class InputEntityDecorators
         }
     }
 
-    private static final class RelationshipTypeDecorator extends InputEntityVisitor.Delegate
+    private static final class EdgeLabelDecorator extends InputEntityVisitor.Delegate
     {
         private final String defaultType;
         private boolean hasType;
 
-        RelationshipTypeDecorator( InputEntityVisitor actual, String defaultType )
+        EdgeLabelDecorator(InputEntityVisitor actual, String defaultType )
         {
             super( actual );
             this.defaultType = defaultType;

@@ -99,15 +99,15 @@ public class DataFactories
     }
 
     /**
-     * Header parser that will read header information, using the default relationship header format,
+     * Header parser that will read header information, using the default edge header format,
      * from the top of the data file.
      *
      * This header factory can be used even when the header exists in a separate file, if that file
      * is the first in the list of files supplied to {@link #data}.
      */
-    public static Header.Factory defaultFormatRelationshipFileHeader()
+    public static Header.Factory defaultFormatEdgeFileHeader()
     {
-        return new DefaultRelationshipFileHeaderParser();
+        return new DefaultEdgeFileHeaderParser();
     }
 
     private abstract static class AbstractDefaultFileHeaderParser implements Header.Factory
@@ -321,9 +321,9 @@ public class DataFactories
         }
     }
 
-    private static class DefaultRelationshipFileHeaderParser extends AbstractDefaultFileHeaderParser
+    private static class DefaultEdgeFileHeaderParser extends AbstractDefaultFileHeaderParser
     {
-        protected DefaultRelationshipFileHeaderParser()
+        protected DefaultEdgeFileHeaderParser()
         {
             // Don't have TYPE as mandatory since a decorator could provide that
             super( false, Type.START_ID, Type.END_ID );
@@ -358,7 +358,7 @@ public class DataFactories
             else if ( isRecognizedType( typeSpec ) )
             {
                 try {
-                    throw new Exception( "Unexpected relationship header type '" + typeSpec + "'" );
+                    throw new Exception( "Unexpected edge header type '" + typeSpec + "'" );
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

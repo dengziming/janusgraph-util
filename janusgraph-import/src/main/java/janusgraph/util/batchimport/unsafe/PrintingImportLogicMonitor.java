@@ -14,20 +14,20 @@ class PrintingImportLogicMonitor implements ImportLogic.Monitor
     }
 
     @Override
-    public void doubleRelationshipRecordUnitsEnabled()
+    public void doubleEdgeRecordUnitsEnabled()
     {
-        out.println( "Will use double record units for all relationships" );
+        out.println( "Will use double record units for all edges" );
     }
 
     @Override
     public void mayExceedNodeIdCapacity( long capacity, long estimatedCount )
     {
-        err.printf( "WARNING: estimated number of relationships %d may exceed capacity %d of selected record format%n",
+        err.printf( "WARNING: estimated number of edges %d may exceed capacity %d of selected record format%n",
                 estimatedCount, capacity );
     }
 
     @Override
-    public void mayExceedRelationshipIdCapacity( long capacity, long estimatedCount )
+    public void mayExceedEdgeIdCapacity( long capacity, long estimatedCount )
     {
         err.printf( "WARNING: estimated number of nodes %d may exceed capacity %d of selected record format%n",
                 estimatedCount, capacity );

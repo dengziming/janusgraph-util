@@ -52,14 +52,14 @@ import static java.util.Arrays.asList;
  *     <li>this is not transaction, which means this doesn't promise ACID</li>
  *     <li>No constraint is imposed when inserting data</li>
  *     <li>if a error occur, the data is unusable</li>
- *     <li>just import nodes and relationships, index will not take efforts, you should use janusgraphManagement to do it </li>
+ *     <li>just import nodes and edges, index will not take efforts, you should use janusgraphManagement to do it </li>
  * </ul>
  *
  * to use this tool, steps are as follows:
  * <ol>
  *     <li>prepare your data in format of CSV, (if in other format, you can implement your own Parser) </li>
  *     <li>node files should have a primary key and label, and properties if have</li>
- *     <li>relationship data should have two primary key from node, and properties if have </li>
+ *     <li>edge data should have two primary key from node, and properties if have </li>
  *     <li>use java command to import data</li>
  *     <li>build index use janusgraph management</li>
  * </ol>
@@ -144,7 +144,7 @@ import static java.util.Arrays.asList;
  *    java -cp class.path.to.BulkLoad
  *    --into /path/to/sstable/dir \
  *    --skip-duplicate-nodes true \
- *    --skip-bad-relationships true \
+ *    --skip-bad-edges true \
  *    --ignore-extra-columns true \
  *    --ignore-empty-strings true \
  *    --bad-tolerance 10000000 \
@@ -157,14 +157,14 @@ import static java.util.Arrays.asList;
  *    --nodes:demigod v_demigod.csv \
  *    --nodes:human v_human.csv \
  *    --nodes:monster v_monster.csv \
- *    --relationships:father e_god_titan_father.txt \
- *    --relationships:father e_demigod_god_father.txt \
- *    --relationships:mother e_demigod_human_mother.txt \
- *    --relationships:lives e_god_location_lives.txt \
- *    --relationships:lives e_monster_location_lives.txt \
- *    --relationships:brother e_god_god_brother.txt \
- *    --relationships:battled e_demigod_monster_battled.txt \
- *    --relationships:pet e_god_monster_pet.txt \
+ *    --edges:father e_god_titan_father.txt \
+ *    --edges:father e_demigod_god_father.txt \
+ *    --edges:mother e_demigod_human_mother.txt \
+ *    --edges:lives e_god_location_lives.txt \
+ *    --edges:lives e_monster_location_lives.txt \
+ *    --edges:brother e_god_god_brother.txt \
+ *    --edges:battled e_demigod_monster_battled.txt \
+ *    --edges:pet e_god_monster_pet.txt \
  *    > /path/to/logfile.log
  *
  * and the you can use gremilin or janusgraph api to query:
@@ -206,7 +206,7 @@ public class BulkLoad {
         PrintStream out = System.out;
 
         Collection<Args.Option<File[]>> nodesFiles;
-        Collection<Args.Option<File[]>> relationshipsFiles;
+        Collection<Args.Option<File[]>> edgesFiles;
         Charset inputEncoding;
         Collector badCollector;
         IdType idType;
@@ -222,7 +222,7 @@ public class BulkLoad {
         File storeDir;
         Number processors;
         long badTolerance;
-        boolean skipBadRelationships;
+        boolean skipBadEdges;
         boolean enableStacktrace;
         boolean skipDuplicateNodes;
         boolean ignoreExtraColumns;
@@ -253,11 +253,11 @@ public class BulkLoad {
                 badOutput = new BufferedOutputStream( fs.openAsOutputStream( badFile, false ) );
             }
             nodesFiles = extractInputFiles( args, Options.NODE_DATA.key(), err );
-            relationshipsFiles = extractInputFiles( args, Options.RELATIONSHIP_DATA.key(), err );
+            edgesFiles = extractInputFiles( args, Options.EDGE_DATA.key(), err );
             String maxMemoryString = args.get( Options.MAX_MEMORY.key(), null );
             maxMemory = parseMaxMemory( maxMemoryString );
 
-            validateInputFiles( nodesFiles, relationshipsFiles );
+            validateInputFiles( nodesFiles, edgesFiles );
             enableStacktrace = args.getBoolean( Options.STACKTRACE.key(), Boolean.FALSE, Boolean.TRUE );
             processors = args.getNumber( Options.PROCESSORS.key(), null );
             idType = args.interpretOption( Options.ID_TYPE.key(),
@@ -265,8 +265,8 @@ public class BulkLoad {
             badTolerance = parseNumberOrUnlimited( args, Options.BAD_TOLERANCE );
             inputEncoding = Charset.forName( args.get( Options.INPUT_ENCODING.key(), defaultCharset().name() ) );
 
-            skipBadRelationships = args.getBoolean( Options.SKIP_BAD_RELATIONSHIPS.key(),
-                    (Boolean) Options.SKIP_BAD_RELATIONSHIPS.defaultValue(), true );
+            skipBadEdges = args.getBoolean( Options.SKIP_BAD_EDGES.key(),
+                    (Boolean) Options.SKIP_BAD_EDGES.defaultValue(), true );
             skipDuplicateNodes = args.getBoolean( Options.SKIP_DUPLICATE_NODES.key(),
                     (Boolean) Options.SKIP_DUPLICATE_NODES.defaultValue(), true );
             ignoreExtraColumns = args.getBoolean( Options.IGNORE_EXTRA_COLUMNS.key(),
@@ -274,7 +274,7 @@ public class BulkLoad {
             defaultHighIO = args.getBoolean( Options.HIGH_IO.key(),
                     (Boolean) Options.HIGH_IO.defaultValue(), true );
 
-            badCollector = getBadCollector( badTolerance, skipBadRelationships, skipDuplicateNodes, ignoreExtraColumns,
+            badCollector = getBadCollector( badTolerance, skipBadEdges, skipDuplicateNodes, ignoreExtraColumns,
                     skipBadEntriesLogging, badOutput );
 
             boolean allowCacheOnHeap = args.getBoolean( Options.CACHE_ON_HEAP.key(),
@@ -298,10 +298,10 @@ public class BulkLoad {
             }
 
             CsvInput input = new CsvInput( nodeData( inputEncoding, nodesFiles ), DataFactories.defaultFormatNodeFileHeader(),
-                    relationshipData( inputEncoding, relationshipsFiles ), DataFactories.defaultFormatRelationshipFileHeader(),
+                    edgeData( inputEncoding, edgesFiles ), DataFactories.defaultFormatEdgeFileHeader(),
                     idType, csvConfiguration( args ,false), badCollector );
             in = System.in;
-            doImport( graph, out, err, in, storeDir, logsDir, badFile, fs, nodesFiles, relationshipsFiles,
+            doImport( graph, out, err, in, storeDir, logsDir, badFile, fs, nodesFiles, edgesFiles,
                     enableStacktrace, input, badOutput, configuration );
 
             success = true;
@@ -333,7 +333,7 @@ public class BulkLoad {
 
     public static void doImport(StandardJanusGraph graph,PrintStream out, PrintStream err, InputStream in, File storeDir, File logsDir, File badFile,
                                 FileSystem fs, Collection<Args.Option<File[]>> nodesFiles,
-                                Collection<Args.Option<File[]>> relationshipsFiles, boolean enableStacktrace, Input input,
+                                Collection<Args.Option<File[]>> edgesFiles, boolean enableStacktrace, Input input,
                                 OutputStream badOutput,
                                 Configuration configuration ) throws IOException
     {
@@ -362,9 +362,9 @@ public class BulkLoad {
                 GraphUtil.getIdAssigner());
         out.println("Create VertexLabel and EdgeLabel");
         GraphUtil.createVertexLabel(nodesFiles);
-        GraphUtil.createEdgeLabel(relationshipsFiles);
+        GraphUtil.createEdgeLabel(edgesFiles);
 
-        printOverview( storeDir, nodesFiles, relationshipsFiles, configuration, out );
+        printOverview( storeDir, nodesFiles, edgesFiles, configuration, out );
         success = false;
         try
         {
@@ -462,15 +462,15 @@ public class BulkLoad {
         };
     }
 
-    public static Iterable<DataFactory> relationshipData( final Charset encoding,
-                                                          Collection<Args.Option<File[]>> relationshipsFiles )
+    public static Iterable<DataFactory> edgeData(final Charset encoding,
+                                                 Collection<Args.Option<File[]>> edgesFiles )
     {
-        return new IterableWrapper<DataFactory,Args.Option<File[]>>( relationshipsFiles )
+        return new IterableWrapper<DataFactory,Args.Option<File[]>>( edgesFiles )
         {
             @Override
             protected DataFactory underlyingObjectToObject( Args.Option<File[]> group )
             {
-                return data( InputEntityDecorators.defaultRelationshipType( group.metadata() ), encoding, group.value() );
+                return data( InputEntityDecorators.defaultEdgeLabel( group.metadata() ), encoding, group.value() );
             }
         };
     }
@@ -517,7 +517,7 @@ public class BulkLoad {
             {
                 if ( file.getName().startsWith( ":" ) )
                 {
-                    err.println( "It looks like you're trying to specify default label or relationship type (" +
+                    err.println( "It looks like you're trying to specify default label or EdgeLabel (" +
                             file.getName() + "). Please put such directly on the key, f.ex. " +
                             Options.NODE_DATA.argument() + ":MyLabel" );
                 }
@@ -573,10 +573,10 @@ public class BulkLoad {
                 "[:Label1:Label2] \"<file1>" + MULTI_FILE_DELIMITER + "<file2>" + MULTI_FILE_DELIMITER + "...\"",
                 "Node CSV header and data. " + INPUT_FILES_DESCRIPTION,
                 true, true ),
-        RELATIONSHIP_DATA( "relationships", null,
-                "[:RELATIONSHIP_TYPE] \"<file1>" + MULTI_FILE_DELIMITER + "<file2>" +
+        EDGE_DATA( "edges", null,
+                "[:EDGE_LABEL] \"<file1>" + MULTI_FILE_DELIMITER + "<file2>" +
                         MULTI_FILE_DELIMITER + "...\"",
-                "Relationship CSV header and data. " + INPUT_FILES_DESCRIPTION,
+                "Edges CSV header and data. " + INPUT_FILES_DESCRIPTION,
                 true, true ),
         DELIMITER( "delimiter", null,
                 "<delimiter-character>",
@@ -613,7 +613,7 @@ public class BulkLoad {
         ID_TYPE( "id-type", IdType.STRING,
                 "<id-type>",
                 "One out of " + Arrays.toString( IdType.values() )
-                        + " and specifies how ids in node/relationship "
+                        + " and specifies how ids in node/edge "
                         + "input files are treated.\n"
                         + IdType.STRING + ": arbitrary strings for identifying nodes.\n"
                         + IdType.INTEGER + ": arbitrary integer values for identifying nodes.\n"
@@ -633,13 +633,13 @@ public class BulkLoad {
         BAD_TOLERANCE( "bad-tolerance", 1000,
                 "<max number of bad entries, or " + UNLIMITED + " for unlimited>",
                 "Number of bad entries before the import is considered failed. This tolerance threshold is "
-                        + "about relationships refering to missing nodes. Format errors in input data are "
+                        + "about edges refering to missing nodes. Format errors in input data are "
                         + "still treated as errors" ),
         SKIP_BAD_ENTRIES_LOGGING( "skip-bad-entries-logging", Boolean.FALSE, "<true/false>",
                 "Whether or not to skip logging bad entries detected during import." ),
-        SKIP_BAD_RELATIONSHIPS( "skip-bad-relationships", Boolean.TRUE,
+        SKIP_BAD_EDGES( "skip-bad-edges", Boolean.TRUE,
                 "<true/false>",
-                "Whether or not to skip importing relationships that refers to missing node ids, i.e. either "
+                "Whether or not to skip importing edges that refers to missing node ids, i.e. either "
                         + "start or end node id/group referring to node that wasn't specified by the "
                         + "node input data. "
                         + "Skipped nodes will be logged"
@@ -787,11 +787,11 @@ public class BulkLoad {
         }
     }
 
-    private static Collector getBadCollector( long badTolerance, boolean skipBadRelationships,
+    private static Collector getBadCollector( long badTolerance, boolean skipBadEdges,
                                               boolean skipDuplicateNodes, boolean ignoreExtraColumns, boolean skipBadEntriesLogging,
                                               OutputStream badOutput )
     {
-        int collect = Collectors.collect( skipBadRelationships, skipDuplicateNodes, ignoreExtraColumns );
+        int collect = Collectors.collect( skipBadEdges, skipDuplicateNodes, ignoreExtraColumns );
         return skipBadEntriesLogging ? silentBadCollector( badTolerance, collect ) : badCollector( badOutput, badTolerance, collect );
     }
 
@@ -990,8 +990,8 @@ public class BulkLoad {
         out.print( Strings.joinAsLines(
                 Strings.TAB + "bin/janusgraph-import --into retail.db --id-type string --nodes:Customer customers.csv ",
                 Strings.TAB + "--nodes products.csv --nodes orders_header.csv,orders1.csv,orders2.csv ",
-                Strings.TAB + "--relationships:CONTAINS order_details.csv ",
-                Strings.TAB + "--relationships:ORDERED customer_orders_header.csv,orders1.csv,orders2.csv" ) );
+                Strings.TAB + "--edges:CONTAINS order_details.csv ",
+                Strings.TAB + "--edges:ORDERED customer_orders_header.csv,orders1.csv,orders2.csv" ) );
     }
 
 
@@ -1048,15 +1048,15 @@ public class BulkLoad {
 
 
     public static void validateInputFiles( Collection<Args.Option<File[]>> nodesFiles,
-                                           Collection<Args.Option<File[]>> relationshipsFiles )
+                                           Collection<Args.Option<File[]>> edgesFiles )
     {
         if ( nodesFiles.isEmpty() )
         {
-            if ( relationshipsFiles.isEmpty() )
+            if ( edgesFiles.isEmpty() )
             {
                 throw new IllegalArgumentException( "No input specified, nothing to import" );
             }
-            throw new IllegalArgumentException( "No node input specified, cannot import relationships without nodes" );
+            throw new IllegalArgumentException( "No node input specified, cannot import edges without nodes" );
         }
     }
 
@@ -1113,15 +1113,15 @@ public class BulkLoad {
         {
             printErrorMessage( "Duplicate input ids that would otherwise clash can be put into separate id space, " +
                             "read more about how to use id spaces in the manual:" +
-                            manualReference( ManualPage.IMPORT_TOOL_FORMAT, Anchor.ID_SPACES ), e, stackTrace,
+                            manualReference( ), e, stackTrace,
                     err );
         }
-        else if ( MissingRelationshipDataException.class.equals( e.getClass() ) )
+        else if ( MissingEdgeDataException.class.equals( e.getClass() ) )
         {
-            printErrorMessage( "Relationship missing mandatory field '" +
-                            ((MissingRelationshipDataException) e).getFieldType() + "', read more about " +
-                            "relationship format in the manual: " +
-                            manualReference( ManualPage.IMPORT_TOOL_FORMAT, Anchor.RELATIONSHIP ), e, stackTrace,
+            printErrorMessage( "Edge missing mandatory field '" +
+                            ((MissingEdgeDataException) e).getFieldType() + "', read more about " +
+                            "edge format in the manual: " +
+                            manualReference(  ), e, stackTrace,
                     err );
         }
         // This type of exception is wrapped since our input code throws InputException consistently,
@@ -1156,13 +1156,13 @@ public class BulkLoad {
         return launderedException( e ); // throw in order to have process exit with !0
     }
 
-    static void printOverview( File storeDir, Collection<Args.Option<File[]>> nodesFiles,
-                               Collection<Args.Option<File[]>> relationshipsFiles,
-                               Configuration configuration, PrintStream out )
+    private static void printOverview(File storeDir, Collection<Args.Option<File[]>> nodesFiles,
+                                      Collection<Args.Option<File[]>> edgesFiles,
+                                      Configuration configuration, PrintStream out)
     {
         out.println( "Importing the contents of these files into " + storeDir + ":" );
         printInputFiles( "Nodes", nodesFiles, out );
-        printInputFiles( "Relationships", relationshipsFiles, out );
+        printInputFiles( "Edges", edgesFiles, out );
         out.println();
         out.println( "Available resources:" );
         printIndented( "Total machine memory: " + ByteUnit.bytes( OsBeanUtil.getTotalPhysicalMemory() ), out );
@@ -1204,38 +1204,7 @@ public class BulkLoad {
         out.println( "  " + value );
     }
 
-    private enum Anchor
-    {
-        ID_SPACES( "import-tool-id-spaces" ),
-        RELATIONSHIP( "import-tool-header-format-rels" );
-
-        private final String anchor;
-
-        Anchor( String anchor )
-        {
-            this.anchor = anchor;
-        }
-    }
-
-    private enum ManualPage
-    {
-        IMPORT_TOOL_FORMAT( "tools/import/file-header-format/" );
-
-        private final String page;
-
-        ManualPage( String page )
-        {
-            this.page = page;
-        }
-
-        public String getReference( Anchor anchor )
-        {
-            // As long as the the operations manual is single-page we only use the anchor.
-            return page + "#" + anchor.anchor;
-        }
-    }
-
-    private static String manualReference( ManualPage page, Anchor anchor )
+    private static String manualReference( )
     {
         // Docs are versioned major.minor-suffix, so drop the patch version.
 

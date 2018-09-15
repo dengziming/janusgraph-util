@@ -6,7 +6,7 @@ package janusgraph.util.batchimport.unsafe.helps;
  * An example usage would be reading a text file where {@link #sourceDescription()} would say the name of the file,
  * and {@link #position()} the byte offset the reader is currently at.
  *
- * Another example could be reading from a relationship db table where {@link #sourceDescription()} would
+ * Another example could be reading from a edge db table where {@link #sourceDescription()} would
  * say the name of the database and table and {@link #position()} some sort of absolute position saying
  * the byte offset to the field.
  */

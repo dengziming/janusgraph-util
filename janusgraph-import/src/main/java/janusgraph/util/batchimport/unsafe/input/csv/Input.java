@@ -24,9 +24,9 @@ public interface Input
         long numberOfNodes();
 
         /**
-         * @return estimated number of relationships for the entire input.
+         * @return estimated number of edges for the entire input.
          */
-        long numberOfRelationships();
+        long numberOfEdges();
 
         /**
          * @return estimated number of node properties.
@@ -34,9 +34,9 @@ public interface Input
         long numberOfNodeProperties();
 
         /**
-         * @return estimated number of relationship properties.
+         * @return estimated number of edge properties.
          */
-        long numberOfRelationshipProperties();
+        long numberOfEdgeProperties();
 
         /**
          * @return estimated size that the estimated number of node properties will require on disk.
@@ -45,10 +45,10 @@ public interface Input
         long sizeOfNodeProperties();
 
         /**
-         * @return estimated size that the estimated number of relationship properties will require on disk.
+         * @return estimated size that the estimated number of edge properties will require on disk.
          * This is a separate estimate since it depends on the type and size of the actual properties.
          */
-        long sizeOfRelationshipProperties();
+        long sizeOfEdgeProperties();
 
         /**
          * @return estimated number of node labels. Examples:
@@ -69,22 +69,22 @@ public interface Input
     InputIterable nodes();
 
     /**
-     * Provides all relationship data for an import.
+     * Provides all edge data for an import.
      *
-     * @return an {@link InputIterator} which will provide all relationship data for the whole import.
+     * @return an {@link InputIterator} which will provide all edge data for the whole import.
      */
-    InputIterable relationships();
+    InputIterable edges();
 
     /**
      * @return {@link IdMapper} which will get populated by {@link InputNode#id() input node ids}
-     * and later queried by {@link InputRelationship#startNode()} and {@link InputRelationship#endNode()} ids
+     * and later queried by {@link janusgraph.util.batchimport.unsafe.output.EdgeImporter#startNode()} and {@link InputEdge#endNode()} ids
      * to resolve potentially temporary input node ids to actual node ids in the database.
      * @param numberArrayFactory The factory for creating data-structures to use for caching internally in the IdMapper.
      */
     IdMapper<String> idMapper(NumberArrayFactory numberArrayFactory);
 
     /**
-     * @return a {@link Collector} capable of writing {@link InputRelationship bad relationships}
+     * @return a {@link Collector} capable of writing {@link InputEdge bad edges}
      * and {@link InputNode duplicate nodes} to an output stream for later handling.
      */
     Collector badCollector();

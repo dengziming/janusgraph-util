@@ -30,7 +30,7 @@ public class CassandraSSTableLoader implements BulkLoader {
 
         /*
          org.apache.cassandra.tools.BulkLoader -d host /path/to/databases/Nodes/0/janusgraph/edgestore/
-         org.apache.cassandra.tools.BulkLoader -d host /path/to/databases/Relationships/0/janusgraph/edgestore/
+         org.apache.cassandra.tools.BulkLoader -d host /path/to/databases/Edges/0/janusgraph/edgestore/
          */
         out.println("org.apache.cassandra.tools.BulkLoader");
         org.janusgraph.diskstorage.configuration.Configuration cassConf = graph.getConfiguration().getConfiguration();
@@ -78,7 +78,7 @@ public class CassandraSSTableLoader implements BulkLoader {
 
         for (int i = 0; i < configuration.maxNumberOfProcessors(); i ++){
             List<String> relationList = new ArrayList<>(argList);
-            String path = storeDir.getAbsolutePath() + File.separator  + DataImporter.RELATIONSHIP_IMPORT_NAME +
+            String path = storeDir.getAbsolutePath() + File.separator  + DataImporter.EDGE_IMPORT_NAME +
                     File.separator + i + File.separator + cassConf.get(CASSANDRA_KEYSPACE) + File.separator + Backend.EDGESTORE_NAME;
             relationList.add(path);
 

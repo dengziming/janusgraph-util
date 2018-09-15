@@ -62,7 +62,7 @@ public interface Configuration
     }
 
     /**
-     * @return number of relationships threshold for considering a node dense.
+     * @return number of edges threshold for considering a node dense.
      */
 /*    default int denseNodeThreshold()
     {
@@ -97,7 +97,7 @@ public interface Configuration
 
     /**
      * @return whether or not to do sequential flushing of the page cache in the during stages which
-     * import nodes and relationships. Having this {@code true} will reduce random I/O and make most
+     * import nodes and edges. Having this {@code true} will reduce random I/O and make most
      * writes happen in this single background thread and will greatly benefit hardware which generally
      * benefits from single sequential writer.
      */

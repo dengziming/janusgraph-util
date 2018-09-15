@@ -37,10 +37,10 @@ public class BadCollector implements Collector
         abstract Exception exception();
     }
 
-    public static final int BAD_RELATIONSHIPS = 0x1;
+    public static final int BAD_EDGES = 0x1;
     public static final int DUPLICATE_NODES = 0x2;
     public static final int EXTRA_COLUMNS = 0x4;
-    public static final int COLLECT_ALL = BAD_RELATIONSHIPS | DUPLICATE_NODES | EXTRA_COLUMNS;
+    public static final int COLLECT_ALL = BAD_EDGES | DUPLICATE_NODES | EXTRA_COLUMNS;
     public static final long UNLIMITED_TOLERANCE = -1;
 
     private final PrintStream out;
@@ -76,9 +76,9 @@ public class BadCollector implements Collector
     }
 
     @Override
-    public void collectBadRelationship( Object startId, String startIdGroup, String type, Object endId,
-            String endIdGroup, Object specificValue ) throws Exception {
-        collect( new RelationshipsProblemReporter( startId, startIdGroup, type, endId, endIdGroup, specificValue ) );
+    public void collectBadEdge(Object startId, String startIdGroup, String type, Object endId,
+                               String endIdGroup, Object specificValue ) throws Exception {
+        collect( new EdgesProblemReporter( startId, startIdGroup, type, endId, endIdGroup, specificValue ) );
     }
 
     @Override
@@ -92,9 +92,9 @@ public class BadCollector implements Collector
     }
 
     @Override
-    public boolean isCollectingBadRelationships()
+    public boolean isCollectingBadEdges()
     {
-        return collects( BAD_RELATIONSHIPS );
+        return collects(BAD_EDGES);
     }
 
     private void collect( ProblemReporter report ) throws Exception {
@@ -149,7 +149,7 @@ public class BadCollector implements Collector
         return (collect & bit) != 0;
     }
 
-    private static class RelationshipsProblemReporter extends ProblemReporter
+    private static class EdgesProblemReporter extends ProblemReporter
     {
         private String message;
         private final Object specificValue;
@@ -159,10 +159,10 @@ public class BadCollector implements Collector
         private final Object endId;
         private final String endIdGroup;
 
-        RelationshipsProblemReporter( Object startId, String startIdGroup, String type,
-                Object endId, String endIdGroup, Object specificValue )
+        EdgesProblemReporter(Object startId, String startIdGroup, String type,
+                             Object endId, String endIdGroup, Object specificValue )
         {
-            super( BAD_RELATIONSHIPS );
+            super(BAD_EDGES);
             this.startId = startId;
             this.startIdGroup = startIdGroup;
             this.type = type;

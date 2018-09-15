@@ -42,17 +42,17 @@ public class ImportLogic implements Closeable
 {
     public interface Monitor
     {
-        void doubleRelationshipRecordUnitsEnabled();
+        void doubleEdgeRecordUnitsEnabled();
 
         void mayExceedNodeIdCapacity(long capacity, long estimatedCount);
 
-        void mayExceedRelationshipIdCapacity(long capacity, long estimatedCount);
+        void mayExceedEdgeIdCapacity(long capacity, long estimatedCount);
     }
 
     public static final Monitor NO_MONITOR = new Monitor()
     {
         @Override
-        public void mayExceedRelationshipIdCapacity( long capacity, long estimatedCount )
+        public void mayExceedEdgeIdCapacity( long capacity, long estimatedCount )
         {   // no-op
         }
 
@@ -62,7 +62,7 @@ public class ImportLogic implements Closeable
         }
 
         @Override
-        public void doubleRelationshipRecordUnitsEnabled()
+        public void doubleEdgeRecordUnitsEnabled()
         {   // no-op
         }
     };
@@ -81,7 +81,7 @@ public class ImportLogic implements Closeable
     // This map contains additional state that gets populated, created and used throughout the stages.
     // The reason that this is a map is to allow for a uniform way of accessing and loading this stage
     // from the outside. Currently these things live here:
-    //   - RelationshipTypeDistribution
+    //   - EdgeLabelDistribution
     private final Map<Class<?>,Object> accessibleState = new HashMap<>();
 
     // components which may get assigned and unassigned in some methods
@@ -170,7 +170,7 @@ public class ImportLogic implements Closeable
 
     /**
      * Imports nodes w/ their properties and labels from {@link Input#nodes()}. This will as a side-effect populate the {@link IdMapper},
-     * to later be used for looking up ID --> nodeId in {@link #importRelationships()}. After a completed node import,
+     * to later be used for looking up ID --> nodeId in {@link #importEdges()}. After a completed node import,
      * {@link #prepareIdMapper()} must be called.
      *
      * @throws IOException on I/O error.
@@ -185,7 +185,7 @@ public class ImportLogic implements Closeable
     }
 
     /**
-     * Prepares {@link IdMapper} to be queried for ID --> nodeId lookups. This is required for running {@link #importRelationships()}.
+     * Prepares {@link IdMapper} to be queried for ID --> nodeId lookups. This is required for running {@link #importEdges()}.
      */
     public void prepareIdMapper()
     {
@@ -206,16 +206,15 @@ public class ImportLogic implements Closeable
     }
 
     /**
-     * Uses {@link IdMapper} as lookup for ID --> nodeId and imports all relationships from {@link Input#relationships()}
-     * and writes them into the  cassandra . No linking between relationships is done in this method,
-     * it's done later in { linkRelationships (int)}.
+     * Uses {@link IdMapper} as lookup for ID --> nodeId and imports all edges from {@link Input#edges()}
+     * and writes them into the  cassandra .
      *
      * @throws IOException on I/O error.
      */
-    public void importRelationships() throws IOException
+    public void importEdges() throws IOException
     {
-        // Import relationships (unlinked), properties
-        DataStatistics typeDistribution = DataImporter.importRelationships(
+        // Import edges (unlinked), properties
+        DataStatistics typeDistribution = DataImporter.importEdges(
                 config.maxNumberOfProcessors(),
                 input, idMapper, badCollector, executionMonitor, storeUpdateMonitor,
                 graph, idAssigner,

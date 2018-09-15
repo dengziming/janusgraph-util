@@ -14,15 +14,15 @@ public class Inputs
     }
 
     public static Input input(
-            final InputIterable nodes, final InputIterable relationships,
+            final InputIterable nodes, final InputIterable edges,
             final IdMapper idMapper, final Collector badCollector, Input.Estimates estimates )
     {
         return new Input()
         {
             @Override
-            public InputIterable relationships()
+            public InputIterable edges()
             {
-                return relationships;
+                return edges;
             }
 
             @Override
@@ -52,9 +52,9 @@ public class Inputs
     }
 
     public static Input.Estimates knownEstimates(
-            long numberOfNodes, long numberOfRelationships,
-            long numberOfNodeProperties, long numberOfRelationshipProperties,
-            long nodePropertiesSize, long relationshipPropertiesSize,
+            long numberOfNodes, long numberOfEdges,
+            long numberOfNodeProperties, long numberOfEdgeProperties,
+            long nodePropertiesSize, long edgePropertiesSize,
             long numberOfNodeLabels )
     {
         return new Input.Estimates()
@@ -66,9 +66,9 @@ public class Inputs
             }
 
             @Override
-            public long numberOfRelationships()
+            public long numberOfEdges()
             {
-                return numberOfRelationships;
+                return numberOfEdges;
             }
 
             @Override
@@ -90,15 +90,15 @@ public class Inputs
             }
 
             @Override
-            public long numberOfRelationshipProperties()
+            public long numberOfEdgeProperties()
             {
-                return numberOfRelationshipProperties;
+                return numberOfEdgeProperties;
             }
 
             @Override
-            public long sizeOfRelationshipProperties()
+            public long sizeOfEdgeProperties()
             {
-                return relationshipPropertiesSize;
+                return edgePropertiesSize;
             }
         };
     }

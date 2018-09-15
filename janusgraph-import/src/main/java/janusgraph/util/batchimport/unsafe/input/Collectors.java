@@ -50,9 +50,9 @@ public class Collectors
         return out -> badCollector( out, tolerance, collect, false );
     }
 
-    public static int collect( boolean skipBadRelationships, boolean skipDuplicateNodes, boolean ignoreExtraColumns )
+    public static int collect( boolean skipBadEdges, boolean skipDuplicateNodes, boolean ignoreExtraColumns )
     {
-        return (skipBadRelationships ? BadCollector.BAD_RELATIONSHIPS : 0 ) |
+        return (skipBadEdges ? BadCollector.BAD_EDGES : 0 ) |
                (skipDuplicateNodes ? BadCollector.DUPLICATE_NODES : 0 ) |
                (ignoreExtraColumns ? BadCollector.EXTRA_COLUMNS : 0 );
     }

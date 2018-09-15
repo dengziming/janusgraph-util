@@ -56,15 +56,15 @@ public class HumanUnderstandableExecutionMonitor implements ExecutionMonitor
     enum ImportStage
     {
         nodeImport,
-        relationshipImport,
+        edgeImport,
         linking,
         postProcessing;
     }
 
     private static final String ESTIMATED_REQUIRED_MEMORY_USAGE = "Estimated required memory usage";
     private static final String ESTIMATED_DISK_SPACE_USAGE = "Estimated disk space usage";
-    private static final String ESTIMATED_NUMBER_OF_RELATIONSHIP_PROPERTIES = "Estimated number of relationship properties";
-    private static final String ESTIMATED_NUMBER_OF_RELATIONSHIPS = "Estimated number of relationships";
+    private static final String ESTIMATED_NUMBER_OF_EDGE_PROPERTIES = "Estimated number of edge properties";
+    private static final String ESTIMATED_NUMBER_OF_EDGES = "Estimated number of edge";
     private static final String ESTIMATED_NUMBER_OF_NODE_PROPERTIES = "Estimated number of node properties";
     private static final String ESTIMATED_NUMBER_OF_NODES = "Estimated number of nodes";
     private static final int DOT_GROUP_SIZE = 10;
@@ -103,12 +103,12 @@ public class HumanUnderstandableExecutionMonitor implements ExecutionMonitor
         printStageHeader( "Import starting",
                 ESTIMATED_NUMBER_OF_NODES, Format.count( estimates.numberOfNodes() ),
                 ESTIMATED_NUMBER_OF_NODE_PROPERTIES, Format.count( estimates.numberOfNodeProperties() ),
-                ESTIMATED_NUMBER_OF_RELATIONSHIPS, Format.count( estimates.numberOfRelationships() ),
-                ESTIMATED_NUMBER_OF_RELATIONSHIP_PROPERTIES, Format.count( estimates.numberOfRelationshipProperties() ),
+                ESTIMATED_NUMBER_OF_EDGES, Format.count( estimates.numberOfEdges() ),
+                ESTIMATED_NUMBER_OF_EDGE_PROPERTIES, Format.count( estimates.numberOfEdgeProperties() ),
                 ESTIMATED_DISK_SPACE_USAGE, ByteUnit.bytes(
 
-                                // TODO also add some padding to include relationship groups?
-                                estimates.sizeOfNodeProperties() + estimates.sizeOfRelationshipProperties() ),
+                                // TODO also add some padding to include edge groups?
+                                estimates.sizeOfNodeProperties() + estimates.sizeOfEdgeProperties() ),
                 ESTIMATED_REQUIRED_MEMORY_USAGE, ByteUnit.bytes( biggestCacheMemory ) );
         out.println();
     }
@@ -126,13 +126,13 @@ public class HumanUnderstandableExecutionMonitor implements ExecutionMonitor
                     dependencyResolver.resolveDependency( Input.Estimates.class ),
                     dependencyResolver.resolveDependency( IdMapper.class ));
         }
-        else if ( execution.getStageName().equals( DataImporter.RELATIONSHIP_IMPORT_NAME ) )
+        else if ( execution.getStageName().equals( DataImporter.EDGE_IMPORT_NAME) )
         {
 
             endPrevious();
-            // Import relationships:
-            // - import relationships
-            initializeRelationshipImport(
+            // Import edges:
+            // - import edges
+            initializeEdgeImport(
                     dependencyResolver.resolveDependency( Input.Estimates.class ),
                     dependencyResolver.resolveDependency( IdMapper.class ));
         }
@@ -172,40 +172,18 @@ public class HumanUnderstandableExecutionMonitor implements ExecutionMonitor
         initializeProgress( goal, ImportStage.nodeImport );
     }
 
-    private void initializeRelationshipImport(Input.Estimates estimates, IdMapper idMapper )
+    private void initializeEdgeImport(Input.Estimates estimates, IdMapper idMapper )
     {
-        long numberOfRelationships = estimates.numberOfRelationships();
-        printStageHeader( "(2/2) Relationship import",
-                ESTIMATED_NUMBER_OF_RELATIONSHIPS, Format.count( numberOfRelationships ),
+        long numberOfEdges = estimates.numberOfEdges();
+        printStageHeader( "(2/2) Edge import",
+                ESTIMATED_NUMBER_OF_EDGES, Format.count( numberOfEdges ),
                 ESTIMATED_DISK_SPACE_USAGE, ByteUnit.bytes(
-                        /*relationshipsDiskUsage( estimates, janusStores ) +*/
-                        estimates.sizeOfRelationshipProperties() ),
+                        /*edgessDiskUsage( estimates, janusStores ) +*/
+                        estimates.sizeOfEdgeProperties() ),
                 ESTIMATED_REQUIRED_MEMORY_USAGE, ByteUnit.bytes(
                         /*baselineMemoryRequirement( janusStores ) +*/
                         GatheringMemoryStatsVisitor.totalMemoryUsageOf( idMapper ) ) );
-        initializeProgress( numberOfRelationships, ImportStage.relationshipImport );
-    }
-
-    private void initializeLinking(
-            DataStatistics distribution )
-    {
-        printStageHeader( "(3/4) Relationship linking",
-                ESTIMATED_REQUIRED_MEMORY_USAGE, ByteUnit.bytes(
-                        defensivelyPadMemoryEstimate( distribution.getNodeCount()) ) );
-
-        // The reason the highId of the relationship store is used, as opposed to actual number of imported relationships
-        // is that the stages underneath operate on id ranges, not knowing which records are actually in use.
-
-
-        // The progress counting of linking stages is special anyway, in that it uses the "progress" stats key,
-        // which is based on actual number of relationships, not relationship ids.
-        long actualRelationshipCount = distribution.getRelationshipCount();
-        initializeProgress(
-                    // node degrees
-                actualRelationshipCount * 2 + // start/end forwards, see RelationshipLinkingProgress
-                actualRelationshipCount * 2,  // start/end backwards, see RelationshipLinkingProgress
-                ImportStage.linking
-                );
+        initializeProgress( numberOfEdges, ImportStage.edgeImport);
     }
 
 

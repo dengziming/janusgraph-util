@@ -124,7 +124,7 @@ public class BulkLoadTest
                 graphDbDir().getAbsolutePath(),
                 "--nodes:" + node_label,
                 nodeData( true, config, nodeIds, TRUE ).getAbsolutePath(),
-                "--relationships:" + relationship_label,
+                "--edges:" + relationship_label,
                 relationshipData( true, config, nodeIds, TRUE).getAbsolutePath() );
 
     }
@@ -144,7 +144,7 @@ public class BulkLoadTest
                 "--nodes:" + node_label,
                 nodeHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                 nodeData( false, config, nodeIds, TRUE ).getAbsolutePath(),
-                "--relationships:" + relationship_label,
+                "--edges:" + relationship_label,
                 relationshipHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                 relationshipData( false, config, nodeIds, TRUE).getAbsolutePath() );
 
@@ -308,7 +308,7 @@ public class BulkLoadTest
                     "--nodes:" + node_label, nodeHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                             nodeData( false, config, nodeIds, TRUE, Charset.defaultCharset(), extraColumns )
                                     .getAbsolutePath(),
-                    "--relationships:" + relationship_label, relationshipHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
+                    "--edges:" + relationship_label, relationshipHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                             relationshipData( false, config, nodeIds, TRUE).getAbsolutePath() );
 
             fail( "Should have thrown exception" );
@@ -341,7 +341,7 @@ public class BulkLoadTest
                 "--nodes:" + node_label, nodeHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                         nodeData( false, config, nodeIds, TRUE, Charset.defaultCharset(), extraColumns )
                                 .getAbsolutePath(),
-                "--relationships:" + relationship_label, relationshipHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
+                "--edges:" + relationship_label, relationshipHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                         relationshipData( false, config, nodeIds, TRUE).getAbsolutePath() );
 
         // THEN
@@ -366,7 +366,7 @@ public class BulkLoadTest
                 nodeData( true, config, nodeIds,
                         lines( NODE_COUNT / 2, NODE_COUNT * 3 / 4 ) ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                 nodeData( false, config, nodeIds, lines( NODE_COUNT * 3 / 4, NODE_COUNT ) ).getAbsolutePath(),
-                "--relationships:" + relationship_label,
+                "--edges:" + relationship_label,
                 relationshipHeader( config ).getAbsolutePath() + MULTI_FILE_DELIMITER +
                 relationshipData( false, config, nodeIds, TRUE).getAbsolutePath() );
     }
@@ -389,9 +389,9 @@ public class BulkLoadTest
                 nodeData( true, config, nodeIds, lines( 0, NODE_COUNT / 2 ) ).getAbsolutePath(),
                 "--nodes:" + node_label + join( secondLabels, ":" ),
                 nodeData( true, config, nodeIds, lines( NODE_COUNT / 2, NODE_COUNT ) ).getAbsolutePath(),
-                "--relationships:" + relationship_label + firstType,
+                "--edges:" + relationship_label + firstType,
                 relationshipData( true, config, nodeIds, lines( 0, RELATIONSHIP_COUNT / 2 )).getAbsolutePath(),
-                "--relationships:" + relationship_label + secondType,
+                "--edges:" + relationship_label + secondType,
                 relationshipData( true, config, nodeIds,
                         lines( RELATIONSHIP_COUNT / 2, RELATIONSHIP_COUNT )).getAbsolutePath() );
 
@@ -424,7 +424,7 @@ public class BulkLoadTest
                            nodeData( false, config, groupOneNodeIds, TRUE ),
                 "--nodes:" + node_label, nodeHeader( config, groupTwo ) + MULTI_FILE_DELIMITER +
                            nodeData( false, config, groupTwoNodeIds, TRUE ),
-                "--relationships:" + relationship_label, relationshipHeader( config, groupOne, groupTwo, false ) + MULTI_FILE_DELIMITER +
+                "--edges:" + relationship_label, relationshipHeader( config, groupOne, groupTwo, false ) + MULTI_FILE_DELIMITER +
                                    relationshipData( false, config, rels.iterator(), TRUE) );
 
     }
@@ -460,8 +460,8 @@ public class BulkLoadTest
         importTool(
                 "--into", graphDbDir().getAbsolutePath(),
                 "--nodes:" + node_label, nodeData( true, config, nodeIds, TRUE ).getAbsolutePath(),
-                // there will be no :TYPE specified in the header of the relationships below
-                "--relationships:" + relationship_label + type,
+                // there will be no :TYPE specified in the header of the edges below
+                "--edges:" + relationship_label + type,
                 relationshipData( true, config, nodeIds, TRUE).getAbsolutePath() );
 
         // THEN
@@ -532,13 +532,13 @@ public class BulkLoadTest
         File relationshipData2 = relationshipData( false, config, relationships.iterator(), lines( 2, 5 ));
         File bad = badFile();
 
-        // WHEN importing data where some relationships refer to missing nodes
+        // WHEN importing data where some edges refer to missing nodes
         importTool(
                 "--into", graphDbDir().getAbsolutePath(),
                 "--nodes:" + node_label, nodeData.getAbsolutePath(),
                 "--bad", bad.getAbsolutePath(),
                 "--bad-tolerance", "2",
-                "--relationships:" + relationship_label, relationshipData1.getAbsolutePath() + MULTI_FILE_DELIMITER +
+                "--edges:" + relationship_label, relationshipData1.getAbsolutePath() + MULTI_FILE_DELIMITER +
                                    relationshipData2.getAbsolutePath() );
 
         // THEN
@@ -565,13 +565,13 @@ public class BulkLoadTest
         File relationshipData1 = relationshipData( true, config, relationships.iterator(), lines( 0, 2 ));
         File relationshipData2 = relationshipData( false, config, relationships.iterator(), lines( 2, 5 ));
 
-        // WHEN importing data where some relationships refer to missing nodes
+        // WHEN importing data where some edges refer to missing nodes
         importTool(
                 "--into", graphDbDir().getAbsolutePath(),
                 "--nodes:" + node_label, nodeData.getAbsolutePath(),
                 "--bad-tolerance", "2",
                 "--skip-bad-entries-logging", "true",
-                "--relationships:" + relationship_label, relationshipData1.getAbsolutePath() + MULTI_FILE_DELIMITER +
+                "--edges:" + relationship_label, relationshipData1.getAbsolutePath() + MULTI_FILE_DELIMITER +
                         relationshipData2.getAbsolutePath() );
 
         assertFalse( badFile().exists() );
@@ -591,7 +591,7 @@ public class BulkLoadTest
                 "--into", graphDbDir().getAbsolutePath(),
                 "--input-encoding", charset.name(),
                 "--nodes:" + node_label, nodeData( true, config, nodeIds, TRUE, charset ).getAbsolutePath(),
-                "--relationships:" + relationship_label, relationshipData( true, config, nodeIds, TRUE, true, charset )
+                "--edges:" + relationship_label, relationshipData( true, config, nodeIds, TRUE, true, charset )
                         .getAbsolutePath() );
     }
 
@@ -607,7 +607,7 @@ public class BulkLoadTest
         {
             importTool(
                     "--into", graphDbDir().getAbsolutePath(),
-                    "--relationships:" + relationship_label,
+                    "--edges:" + relationship_label,
                     relationshipData( true, config, nodeIds, TRUE).getAbsolutePath() );
             fail( "Should have failed" );
         }
@@ -630,7 +630,7 @@ public class BulkLoadTest
         importTool(
                 "--into", graphDbDir().getAbsolutePath(),
                 "--nodes:" + node_label, nodeData( true, config, nodeIds, TRUE ).getAbsolutePath(),
-                "--relationships:" + relationship_label, relationshipData( true, config, relationshipData.iterator(),
+                "--edges:" + relationship_label, relationshipData( true, config, relationshipData.iterator(),
                         TRUE).getAbsolutePath() );
 
 
@@ -779,7 +779,7 @@ public class BulkLoadTest
                 "--delimiter", "\\t",
                 "--array-delimiter", String.valueOf( config.arrayDelimiter() ),
                 "--nodes:" + node_label, nodeData( true, config, nodeIds, TRUE ).getAbsolutePath(),
-                "--relationships:" + relationship_label, relationshipData( true, config, nodeIds, TRUE).getAbsolutePath() );
+                "--edges:" + relationship_label, relationshipData( true, config, nodeIds, TRUE).getAbsolutePath() );
 
     }
 
@@ -798,7 +798,7 @@ public class BulkLoadTest
                     "--delimiter", "\\bogus",
                     "--array-delimiter", String.valueOf( config.arrayDelimiter() ),
                     "--nodes:" + node_label, nodeData( true, config, nodeIds, TRUE ).getAbsolutePath(),
-                    "--relationships:" + relationship_label, relationshipData( true, config, nodeIds, TRUE).getAbsolutePath() );
+                    "--edges:" + relationship_label, relationshipData( true, config, nodeIds, TRUE).getAbsolutePath() );
             fail( "Should have failed" );
         }
         catch ( IllegalArgumentException e )
@@ -1088,13 +1088,13 @@ public class BulkLoadTest
         File relationshipData = relationshipData( true, config, relationships.iterator(), TRUE);
         File bad = badFile();
 
-        // WHEN importing data where some relationships refer to missing nodes
+        // WHEN importing data where some edges refer to missing nodes
         importTool(
                 "--into", graphDbDir().getAbsolutePath(),
                 "--nodes:" + node_label, nodeData.getAbsolutePath(),
                 "--bad", bad.getAbsolutePath(),
-                "--skip-bad-relationships", "true",
-                "--relationships:" + relationship_label, relationshipData.getAbsolutePath() );
+                "--skip-bad-edges", "true",
+                "--edges:" + relationship_label, relationshipData.getAbsolutePath() );
 
         String badContents = FileUtils.readTextFile( bad, Charset.defaultCharset() );
         assertEquals( badContents, 2, occurencesOf( badContents, "is missing data" ) );
@@ -1336,7 +1336,7 @@ public class BulkLoadTest
                                   Iterator<RelationshipDataLine> data, IntPredicate linePredicate,
                                   Charset encoding) throws Exception
     {
-        File file = file( fileName( "relationships.csv" ) );
+        File file = file( fileName( "edges.csv" ) );
         try ( PrintStream writer = writer( file, encoding ) )
         {
             if ( includeHeader )
@@ -1367,7 +1367,7 @@ public class BulkLoadTest
     private File relationshipHeader( Configuration config, String startIdGroup, String endIdGroup, boolean specifyType,
             Charset encoding ) throws Exception
     {
-        File file = file( fileName( "relationships-header.csv" ) );
+        File file = file( fileName( "edges-header.csv" ) );
         try ( PrintStream writer = writer( file, encoding ) )
         {
             writeRelationshipHeader( writer, config, startIdGroup, endIdGroup, specifyType );
