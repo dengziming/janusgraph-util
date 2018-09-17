@@ -38,7 +38,7 @@ public class IdMappers
         }
 
         @Override
-        public void prepare(LongFunction<Object> inputIdLookup, Collector collector, ProgressListener progress )
+        public void prepare(LongFunction<Long> inputIdLookup, Collector collector, ProgressListener progress )
         {   // No need to prepare anything
         }
 
@@ -101,7 +101,7 @@ public class IdMappers
      * @param groups {@link Groups} containing all id groups.
      * @return {@link IdMapper} for when input ids are strings.
      */
-    public static IdMapper strings(NumberArrayFactory cacheFactory, Groups groups )
+    public static IdMapper<String> strings(NumberArrayFactory cacheFactory, Groups groups )
     {
         return new EncodingIdMapper( cacheFactory, new StringEncoder(), Radix.STRING, NO_MONITOR, dynamic(), groups,
                 numberOfCollisions -> new StringCollisionValues( cacheFactory, numberOfCollisions ) );

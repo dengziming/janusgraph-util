@@ -27,7 +27,7 @@ public enum IdType
         }
 
         @Override
-        public IdMapper idMapper(NumberArrayFactory numberArrayFactory, Groups groups )
+        public IdMapper<String> idMapper(NumberArrayFactory numberArrayFactory, Groups groups )
         {
             return IdMappers.strings( numberArrayFactory, groups );
         }
@@ -48,7 +48,6 @@ public enum IdType
         @Override
         public IdMapper idMapper( NumberArrayFactory numberArrayFactory, Groups groups )
         {
-//            return IdMappers.longs( numberArrayFactory, groups );
             return null;
         }
     },

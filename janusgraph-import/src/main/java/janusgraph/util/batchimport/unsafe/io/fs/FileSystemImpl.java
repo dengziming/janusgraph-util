@@ -19,12 +19,6 @@ public class FileSystemImpl implements FileSystem
 {
     static final String UNABLE_TO_CREATE_DIRECTORY_FORMAT = "Unable to create directory path [%s] for janus-import store.";
 
-    @Override
-    public StoreFileChannel open(File fileName, OpenMode openMode) throws IOException {
-        // Returning only the channel is ok, because the channel, when close()d will close its parent File.
-        FileChannel channel = new RandomAccessFile( fileName, openMode.mode() ).getChannel();
-        return getStoreFileChannel( channel );
-    }
 
 
     @Override
@@ -33,11 +27,6 @@ public class FileSystemImpl implements FileSystem
         return new FileOutputStream( fileName, append );
     }
 
-    @Override
-    public StoreFileChannel create( File fileName ) throws IOException
-    {
-        return open( fileName, OpenMode.READ_WRITE );
-    }
 
     @Override
     public void mkdirs( File path ) throws IOException
@@ -102,10 +91,6 @@ public class FileSystemImpl implements FileSystem
     private final Map<Class<? extends ThirdPartyFileSystem>, ThirdPartyFileSystem> thirdPartyFileSystems =
             new HashMap<>();
 
-    protected StoreFileChannel getStoreFileChannel( FileChannel channel )
-    {
-        return new StoreFileChannel( channel );
-    }
 
     @Override
     public void close() throws IOException

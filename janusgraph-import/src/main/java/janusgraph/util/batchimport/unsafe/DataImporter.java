@@ -5,7 +5,7 @@ import janusgraph.util.batchimport.unsafe.graph.store.ImportStore;
 import janusgraph.util.batchimport.unsafe.idassigner.BulkIdAssigner;
 import janusgraph.util.batchimport.unsafe.idmapper.IdMapper;
 import janusgraph.util.batchimport.unsafe.input.*;
-import janusgraph.util.batchimport.unsafe.input.csv.Input;
+import janusgraph.util.batchimport.unsafe.input.Input;
 import janusgraph.util.batchimport.unsafe.io.IoMonitor;
 import janusgraph.util.batchimport.unsafe.io.IoTracer;
 import janusgraph.util.batchimport.unsafe.output.EntityImporter;

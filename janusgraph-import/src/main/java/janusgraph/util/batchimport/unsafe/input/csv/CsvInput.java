@@ -62,10 +62,10 @@ public class CsvInput implements Input
                 new Groups() );
     }
 
-    CsvInput(
+    private CsvInput(
             Iterable<DataFactory> nodeDataFactory, Header.Factory nodeHeaderFactory,
             Iterable<DataFactory> edgeDataFactory, Header.Factory edgeHeaderFactory,
-            IdType idType, Configuration config, Collector badCollector, Groups groups )
+            IdType idType, Configuration config, Collector badCollector, Groups groups)
     {
         assertSaneConfiguration( config );
 

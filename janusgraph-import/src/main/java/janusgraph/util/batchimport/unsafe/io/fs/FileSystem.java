@@ -10,11 +10,9 @@ import java.nio.file.CopyOption;
 public interface FileSystem extends Closeable
 {
 
-    StoreChannel open(File fileName, OpenMode openMode) throws IOException;
 
     OutputStream openAsOutputStream(File fileName, boolean append) throws IOException;
 
-    StoreChannel create(File fileName) throws IOException;
 
     boolean fileExists(File fileName);
 

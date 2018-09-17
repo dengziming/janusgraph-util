@@ -22,7 +22,6 @@ import java.util.function.LongFunction;
 import static java.lang.Math.*;
 
 /**
- * Created by dengziming on 15/08/2018.
  *
  * Maps arbitrary values to long ids. The values can be {@link #put(String, Group, long) added} in any order,
  * but {@link #needsPreparation() needs} {@link #prepare(LongFunction, Collector, ProgressListener) preparation}

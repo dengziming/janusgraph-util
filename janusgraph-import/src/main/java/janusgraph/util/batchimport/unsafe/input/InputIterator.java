@@ -2,7 +2,6 @@ package janusgraph.util.batchimport.unsafe.input;
 
 
 import janusgraph.util.batchimport.unsafe.helps.ResourceIterator;
-import janusgraph.util.batchimport.unsafe.input.csv.Input;
 
 import java.io.Closeable;
 import java.io.IOException;

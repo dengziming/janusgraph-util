@@ -9,7 +9,7 @@ import janusgraph.util.batchimport.unsafe.idmapper.IdMapper;
 import janusgraph.util.batchimport.unsafe.idmapper.cache.MemoryStatsVisitor;
 import janusgraph.util.batchimport.unsafe.idmapper.cache.NumberArrayFactory;
 import janusgraph.util.batchimport.unsafe.input.Collector;
-import janusgraph.util.batchimport.unsafe.input.csv.Input;
+import janusgraph.util.batchimport.unsafe.input.Input;
 import janusgraph.util.batchimport.unsafe.io.fs.FileSystem;
 import janusgraph.util.batchimport.unsafe.log.Log;
 import janusgraph.util.batchimport.unsafe.log.LogService;

@@ -4,7 +4,7 @@ package janusgraph.util.batchimport.unsafe;
 import janusgraph.util.batchimport.unsafe.graph.store.ImportStore;
 import janusgraph.util.batchimport.unsafe.graph.store.ImportStores;
 import janusgraph.util.batchimport.unsafe.idassigner.BulkIdAssigner;
-import janusgraph.util.batchimport.unsafe.input.csv.Input;
+import janusgraph.util.batchimport.unsafe.input.Input;
 import janusgraph.util.batchimport.unsafe.io.fs.FileSystem;
 import janusgraph.util.batchimport.unsafe.lifecycle.LifecycleAdapter;
 import janusgraph.util.batchimport.unsafe.log.LogService;

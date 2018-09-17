@@ -182,33 +182,6 @@ public class FileUtils
         return out.toString();
     }
 
-    public static OpenOption[] convertOpenMode( OpenMode mode )
-    {
-        OpenOption[] options;
-        switch ( mode )
-        {
-        case READ:
-            options = new OpenOption[]{READ};
-            break;
-        case READ_WRITE:
-            options = new OpenOption[]{CREATE, READ, WRITE};
-            break;
-        case SYNC:
-            options = new OpenOption[]{CREATE, READ, WRITE, SYNC};
-            break;
-        case DSYNC:
-            options = new OpenOption[]{CREATE, READ, WRITE, DSYNC};
-            break;
-        default:
-            throw new IllegalArgumentException( "Unsupported mode: " + mode );
-        }
-        return options;
-    }
-
-    public static FileChannel open( Path path, OpenMode openMode ) throws IOException
-    {
-        return FileChannel.open( path, convertOpenMode( openMode ) );
-    }
 
     /**
      * Calculates the size of a given directory or file given the provided abstract filesystem.

@@ -1,4 +1,4 @@
-package janusgraph.util.batchimport.unsafe.input.csv;
+package janusgraph.util.batchimport.unsafe.input;
 
 
 import janusgraph.util.batchimport.unsafe.BatchImporter;
@@ -7,6 +7,7 @@ import janusgraph.util.batchimport.unsafe.idmapper.cache.NumberArrayFactory;
 import janusgraph.util.batchimport.unsafe.input.Collector;
 import janusgraph.util.batchimport.unsafe.input.InputIterable;
 import janusgraph.util.batchimport.unsafe.input.InputIterator;
+import janusgraph.util.batchimport.unsafe.input.csv.Value;
 
 import java.io.IOException;
 import java.util.function.ToIntFunction;
