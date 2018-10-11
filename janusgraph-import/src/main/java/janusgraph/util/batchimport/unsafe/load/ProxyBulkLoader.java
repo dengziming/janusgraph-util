@@ -1,7 +1,9 @@
 package janusgraph.util.batchimport.unsafe.load;
 
 import janusgraph.util.batchimport.unsafe.Configuration;
+import janusgraph.util.batchimport.unsafe.load.cassandra.Cassandra3ShellLoader;
 import janusgraph.util.batchimport.unsafe.load.cassandra.CassandraSSTableLoader;
+import org.apache.cassandra.utils.FBUtilities;
 import org.janusgraph.graphdb.database.StandardJanusGraph;
 
 import java.io.File;
@@ -23,7 +25,14 @@ public class ProxyBulkLoader implements BulkLoader {
         String backend = graph.getConfiguration().getConfiguration().get(STORAGE_BACKEND);
 
         if ("cassandrathrift".equals(backend)){
-            real = new CassandraSSTableLoader();
+            String versionString = FBUtilities.getReleaseVersionString();
+
+            // cassandra3
+            if (versionString != null && versionString.startsWith("3")){
+                real = new Cassandra3ShellLoader();
+            }else {
+                real = new CassandraSSTableLoader();
+            }
         }else if ("hbase".equals(backend)){
             // ignore
         }else if ("bigtable".equals(backend)){

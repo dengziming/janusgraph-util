@@ -12,7 +12,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-version>1.8</java-version>
-        <janusgraph-version>0.2.0</janusgraph-version>
+        <janusgraph.version>0.3.0</janusgraph.version>
+        <cassandra.version>3.10</cassandra.version>
         <commons.lang3.version>3.3.1</commons.lang3.version>
     </properties>
 
@@ -34,32 +35,32 @@
             <dependency>
                 <groupId>org.janusgraph</groupId>
                 <artifactId>janusgraph-core</artifactId>
-                <version>${janusgraph-version}</version>
+                <version>${janusgraph.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.janusgraph</groupId>
                 <artifactId>janusgraph-cassandra</artifactId>
-                <version>${janusgraph-version}</version>
+                <version>${janusgraph.version}</version>
             </dependency>
 
 
             <dependency>
                 <groupId>org.janusgraph</groupId>
                 <artifactId>janusgraph-berkeleyje</artifactId>
-                <version>${janusgraph-version}</version>
+                <version>${janusgraph.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.janusgraph</groupId>
                 <artifactId>janusgraph-es</artifactId>
-                <version>${janusgraph-version}</version>
+                <version>${janusgraph.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.janusgraph</groupId>
                 <artifactId>janusgraph-hadoop-core</artifactId>
-                <version>${janusgraph-version}</version>
+                <version>${janusgraph.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.janusgraph</groupId>
