@@ -59,3 +59,9 @@ there is ID behind name, and the (god) represent Label, it's unnecessary sometim
 csv file header of edge files, for example `god:START_ID(god),monster:END_ID(monster)`, START_ID means the start node
 of the edge, END_ID means the end node of the edge, (god) and (monster) represent the label of nodes, 
 god and monster are property name, which are meaningless, so you can use `:START_ID(god),:END_ID(monster)` instead.
+
+
+### cassandra3
+
+if you are using janusgraph 3.X and cassandra 3.X, you should use `sstableloader` to manually load into cassandra. the 
+commend will be printed after the program finished
