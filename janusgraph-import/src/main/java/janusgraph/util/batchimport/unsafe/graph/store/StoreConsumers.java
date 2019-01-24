@@ -38,7 +38,7 @@ public class StoreConsumers {
 
         private List<Entry> EMPTY = new ArrayList<>();
 
-        public JanusGraphTxWriter(StandardJanusGraph graph, String edgestore) throws BackendException {
+        public JanusGraphTxWriter(StandardJanusGraph graph) throws BackendException {
             super(graph);
         }
 

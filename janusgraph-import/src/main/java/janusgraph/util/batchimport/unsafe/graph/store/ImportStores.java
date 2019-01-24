@@ -21,49 +21,23 @@ import static org.janusgraph.graphdb.configuration.GraphDatabaseConfiguration.BU
 public class ImportStores {
 
 
-    public static class BulkImportStoreImpl implements ImportStore {
+    public static abstract class AbstractImportStoreImpl implements ImportStore {
 
-        private StandardJanusGraph graph;
-        private String path;
-        private String keySpace;
-        private String edgestore ; // default value "edgestore"
-        private int numMutations;
-        private int persistChunkSize;
-        private boolean open;
-        private StoreConsumers.KeyColumnValueConsumer consumer;
+        protected StandardJanusGraph graph;
+        int numMutations;
+        int persistChunkSize;
+        boolean open;
         Map<String, Map<StaticBuffer, KCVEntryMutation>> mutations ;
+        protected StoreConsumers.KeyColumnValueConsumer consumer;
+        String edgestore ; // default value "edgestore"
 
-
-        public BulkImportStoreImpl(StandardJanusGraph graph, String path, String keySpace, String edgestore) {
+        AbstractImportStoreImpl(StandardJanusGraph graph, String edgestore) {
             this.graph = graph;
-            this.path = path;
-            this.keySpace = keySpace;
-            this.edgestore = edgestore;
             this.numMutations = 0;
             this.persistChunkSize = graph.getConfiguration().getConfiguration().get(BUFFER_SIZE);
-            this.open = true;
             this.mutations = new HashMap<>(2);// edgestore and graphindex, here isn't graphindex
-            // this.consumer = new StoreConsumers.SingleWriter(graph,edgestore);//
-            try {
-                this.consumer = new CassandraSSTableWriter(graph,path,keySpace,edgestore);
-            } catch (BackendException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public String getPath() {
-            return path;
-        }
-
-        @Override
-        public String getKeySpace() {
-            return keySpace;
-        }
-
-        @Override
-        public String getTable() {
-            return edgestore;
+            this.open = true;
+            this.edgestore = edgestore;
         }
 
         @Override
@@ -128,6 +102,69 @@ public class ImportStores {
                 open = false;
             }
 
+        }
+    }
+
+    public static class TxImportStoreImpl extends AbstractImportStoreImpl {
+
+        public TxImportStoreImpl(StandardJanusGraph graph, String edgestore) {
+            super(graph, edgestore);
+            try {
+                this.consumer = new StoreConsumers.JanusGraphTxWriter(graph);
+            } catch (BackendException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public String getPath() {
+            throw new UnsupportedOperationException("TxImportStoreImpl doesn't support getpath");
+        }
+
+        @Override
+        public String getKeySpace() {
+            throw new UnsupportedOperationException("TxImportStoreImpl doesn't support getKeySpace");
+        }
+
+        @Override
+        public String getTable() {
+            throw new UnsupportedOperationException("TxImportStoreImpl doesn't support getTable");
+        }
+    }
+
+
+    public static class BulkImportStoreImpl extends AbstractImportStoreImpl {
+
+
+        private String path;
+        private String keySpace;
+
+
+        public BulkImportStoreImpl(StandardJanusGraph graph, String path, String keySpace, String edgestore) {
+            super(graph, edgestore);
+            this.path = path;
+            this.keySpace = keySpace;
+            // this.consumer = new StoreConsumers.SingleWriter(graph,edgestore);//
+            try {
+                this.consumer = new CassandraSSTableWriter(graph,path,keySpace,edgestore);
+            } catch (BackendException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public String getPath() {
+            return path;
+        }
+
+        @Override
+        public String getKeySpace() {
+            return keySpace;
+        }
+
+        @Override
+        public String getTable() {
+            return edgestore;
         }
 
     }

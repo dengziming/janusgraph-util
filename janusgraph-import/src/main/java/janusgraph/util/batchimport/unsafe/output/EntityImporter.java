@@ -92,9 +92,17 @@ public abstract class EntityImporter extends InputEntityVisitor.Adapter {
         this.graph = graph;
         this.stx = (StandardJanusGraphTx) graph.newTransaction();
         this.mgmt = graph.openManagement();
-        this.janusStore = new ImportStores.BulkImportStoreImpl(graph,
-                janusStore.getPath() + File.separator + title + File.separator + rank,
-                janusStore.getKeySpace(),janusStore.getTable());
+        if (true) { // FIXME alter this condition to use configuration
+            // TxImportStoreImpl will write data to janusgraph
+            this.janusStore = new ImportStores.TxImportStoreImpl(graph, janusStore.getTable());
+        }else {
+            // BulkImportStoreImpl will write data to SSTable
+            this.janusStore = new ImportStores.BulkImportStoreImpl(graph,
+                    janusStore.getPath() + File.separator + title + File.separator + rank,
+                    janusStore.getKeySpace(),janusStore.getTable());
+        }
+
+
         //this.mutator = new BulkMutators.ParallelBulkMutator(graph,janusStore,  2);// use 1/3 of all cores. +1 in case of numRunners<3
         this.mutator = new BulkMutators.BulkMutatorImpl(graph,this.janusStore);
     }

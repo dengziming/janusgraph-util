@@ -59,3 +59,29 @@ there is ID behind name, and the (god) represent Label, it's unnecessary sometim
 csv file header of edge files, for example `god:START_ID(god),monster:END_ID(monster)`, START_ID means the start node
 of the edge, END_ID means the end node of the edge, (god) and (monster) represent the label of nodes, 
 god and monster are property name, which are meaningless, so you can use `:START_ID(god),:END_ID(monster)` instead.
+
+
+line 95 of `janusgraph.util.batchimport.unsafe.output.EntityImporter` has code：
+
+```java
+
+if (true) { // FIXME alter this condition to use configuration
+    // TxImportStoreImpl will write data to janusgraph
+    this.janusStore = new ImportStores.TxImportStoreImpl(graph, janusStore.getTable());
+}else {
+    // BulkImportStoreImpl will write data to SSTable
+    this.janusStore = new ImportStores.BulkImportStoreImpl(graph,
+            janusStore.getPath() + File.separator + title + File.separator + rank,
+            janusStore.getKeySpace(),janusStore.getTable());
+}
+```
+you can change it to BulkImportStoreImpl.
+
+
+# 中文介绍
+
+直接使用命令运行就可以，在代码的 `janusgraph.util.batchimport.unsafe.output.EntityImporter` 的 95 行，写死了 `TxImportStoreImpl`,
+你可以改掉，
+- 如果使用 `TxImportStoreImpl` 就会将数据写入 janusgraph，
+- 如果使用 `BulkImportStoreImpl` 就会将数据写为 SSTable，然后需要使用命令行导入cassandra
+- 注意 cassandra 的 SSTableWriter 有 bug，如果数据量大会出错。
