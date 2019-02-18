@@ -178,7 +178,7 @@ public class ImportLogic implements Closeable
     public void importNodes() throws IOException
     {
         // Import nodes, properties
-        DataImporter.importNodes( config.maxNumberOfProcessors(), input, idMapper, // config.outputDir()
+        DataImporter.importNodes(config.bulkLoading(), config.maxNumberOfProcessors(), input, idMapper, // config.outputDir()
               executionMonitor, storeUpdateMonitor, graph, idAssigner,
                 janusStore);
         updatePeakMemoryUsage();
@@ -214,7 +214,7 @@ public class ImportLogic implements Closeable
     public void importEdges() throws IOException
     {
         // Import edges (unlinked), properties
-        DataStatistics typeDistribution = DataImporter.importEdges(
+        DataStatistics typeDistribution = DataImporter.importEdges(config.bulkLoading(),
                 config.maxNumberOfProcessors(),
                 input, idMapper, badCollector, executionMonitor, storeUpdateMonitor,
                 graph, idAssigner,

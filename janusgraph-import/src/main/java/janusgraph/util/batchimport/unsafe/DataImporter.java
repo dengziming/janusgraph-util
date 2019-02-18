@@ -152,20 +152,20 @@ public class DataImporter
         return roughEntityCountProgress.sum();
     }
 
-    public static void importNodes(int numRunners, Input input, IdMapper<String> idMapper,
+    public static void importNodes(boolean bulkLoading,int numRunners, Input input, IdMapper<String> idMapper,
                                    ExecutionMonitor executionMonitor, Monitor monitor ,
                                    StandardJanusGraph graph ,BulkIdAssigner idAssigner,
                                    ImportStore janusStore
                                    )
                     throws IOException
     {
-        Function<Integer,EntityImporter> importers = (i) -> new NodeImporter(numRunners,i,NODE_IMPORT_NAME, idMapper, monitor,
+        Function<Integer,EntityImporter> importers = (i) -> new NodeImporter(bulkLoading,numRunners,i,NODE_IMPORT_NAME, idMapper, monitor,
                 graph,idAssigner,janusStore);
         importData( NODE_IMPORT_NAME, numRunners, input.nodes(), importers, executionMonitor,
                 new MemoryUsageStatsProvider( idMapper ) );
     }
 
-    public static DataStatistics importEdges(int numRunners, Input input,
+    public static DataStatistics importEdges(boolean bulkLoading,int numRunners, Input input,
                                              IdMapper<String> idMapper, Collector badCollector, ExecutionMonitor executionMonitor,
                                              Monitor monitor,
                                              StandardJanusGraph graph ,
@@ -175,7 +175,7 @@ public class DataImporter
     {
         DataStatistics typeDistribution = new DataStatistics( monitor.nodes.sum(), monitor.properties.sum(),
                 new DataStatistics.EdgeTypeCount[0] );
-        Function<Integer,EntityImporter> importers = (i) -> new EdgeImporter(numRunners,i, EDGE_IMPORT_NAME, idMapper, monitor,
+        Function<Integer,EntityImporter> importers = (i) -> new EdgeImporter(bulkLoading,numRunners,i, EDGE_IMPORT_NAME, idMapper, monitor,
                 badCollector , graph , idAssigner,janusStore);
         importData(EDGE_IMPORT_NAME, numRunners, input.edges(), importers, executionMonitor,
                 new MemoryUsageStatsProvider( idMapper ) );

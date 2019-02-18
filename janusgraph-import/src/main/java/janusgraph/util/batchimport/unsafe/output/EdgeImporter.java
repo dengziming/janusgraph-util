@@ -46,7 +46,8 @@ public class EdgeImporter extends EntityImporter
     private String type;
     private EdgeLabel edgeLabel;
 
-    public EdgeImporter(int numRunners,
+    public EdgeImporter(boolean bulkLoading,
+                        int numRunners,
                         int threadNum,
                         String title,
                         IdMapper<String> idMapper,
@@ -56,7 +57,7 @@ public class EdgeImporter extends EntityImporter
                         BulkIdAssigner idAssigner,
                         ImportStore janusStore)
     {
-        super(numRunners,threadNum,title,monitor,graph,idAssigner,janusStore);
+        super(bulkLoading,numRunners,threadNum,title,monitor,graph,idAssigner,janusStore);
         this.idMapper = idMapper;
         this.badCollector = badCollector;
         edgeCount = 0;

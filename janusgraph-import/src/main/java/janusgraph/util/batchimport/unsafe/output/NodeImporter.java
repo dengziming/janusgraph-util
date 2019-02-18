@@ -30,7 +30,8 @@ public class NodeImporter extends EntityImporter{
     private boolean hasLabelField;
     private JanusGraphVertex nodeRecord;
 
-    public NodeImporter(int numRunners,
+    public NodeImporter(boolean bulkLoading,
+                        int numRunners,
                         int threadNum,
                         String title,
                         IdMapper<String> idMapper,
@@ -39,7 +40,7 @@ public class NodeImporter extends EntityImporter{
                         BulkIdAssigner idAssigner,
                         ImportStore janusStore
                         ) {
-        super(numRunners,threadNum,title,monitor,graph,idAssigner,janusStore);
+        super(bulkLoading,numRunners,threadNum,title,monitor,graph,idAssigner,janusStore);
         this.idMapper = idMapper;
 
         nodeRecord = new StandardVertex(stx, -1, ElementLifeCycle.New);// temp id

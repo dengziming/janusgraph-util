@@ -22,6 +22,14 @@ public interface Configuration
     int DEFAULT_MAX_MEMORY_PERCENT = 90;
 
     /**
+     * whether to load data into DB by bulk-loading, if true, SSTable and HFile will be generated
+     */
+    default boolean bulkLoading()
+    {
+        return false;
+    }
+
+    /**
      * A {@link Stage} works with batches going through one or more {@link Step steps} where one or more threads
      * process batches at each {@link Step}. This setting dictates how big the batches that are passed around are.
      */

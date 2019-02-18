@@ -8,6 +8,7 @@ util for janusgraph to import data and so on
 --skip-bad-edges true \ 
 --ignore-extra-columns true \ 
 --ignore-empty-strings true \ 
+--bulk-loading true \
 --bad-tolerance 10000000 \ 
 --processors 1 \ 
 --id-type string \ 
@@ -39,6 +40,9 @@ janus-config:key :to specify your janusgraph config if --janus-config-file is mi
 
 ignore-empty-strings : empty strings in csv file will be ignored
 
+bulk-loading: if true, will generator SSTable(cassandra) or HFile(Hbase) instead of insert one by one;
+if false, vertices and edges will be inserted into DB one by one through transaction.
+
 max-memory: the max offheap memory, this should be lager than 64*NumberOfNodes 
 
 processors: Number of Thread
@@ -60,28 +64,33 @@ csv file header of edge files, for example `god:START_ID(god),monster:END_ID(mon
 of the edge, END_ID means the end node of the edge, (god) and (monster) represent the label of nodes, 
 god and monster are property name, which are meaningless, so you can use `:START_ID(god),:END_ID(monster)` instead.
 
+# error handling
 
-line 95 of `janusgraph.util.batchimport.unsafe.output.EntityImporter` has code：
+if you set bulk-loading=true, you can just use Cassandra as backend db.
 
-```java
+if you set bulk-loading=false, you can use any bigtable that janusgraph support as backend. 
+if you got error like this:`Input error: Could not find implementation class: org.janusgraph.diskstorage.cql.CQLStoreManager`
+you can add some dependency to pom.xml
 
-if (true) { // FIXME alter this condition to use configuration
-    // TxImportStoreImpl will write data to janusgraph
-    this.janusStore = new ImportStores.TxImportStoreImpl(graph, janusStore.getTable());
-}else {
-    // BulkImportStoreImpl will write data to SSTable
-    this.janusStore = new ImportStores.BulkImportStoreImpl(graph,
-            janusStore.getPath() + File.separator + title + File.separator + rank,
-            janusStore.getKeySpace(),janusStore.getTable());
-}
+```xml
+<groupId>org.janusgraph</groupId>
+<artifactId>janusgraph-cql</artifactId>
 ```
-you can change it to BulkImportStoreImpl.
-
 
 # 中文介绍
 
-直接使用命令运行就可以，在代码的 `janusgraph.util.batchimport.unsafe.output.EntityImporter` 的 95 行，写死了 `TxImportStoreImpl`,
-你可以改掉，
-- 如果使用 `TxImportStoreImpl` 就会将数据写入 janusgraph，
-- 如果使用 `BulkImportStoreImpl` 就会将数据写为 SSTable，然后需要使用命令行导入cassandra
+直接使用命令运行就可以，注意配置项 bulk-loading 默认为 false，如果改成 true，可以实现快速导数据到 Cassandra，
+原理是使用Cassandra提供的 SSTableloader。目前只支持 Cassandra 的快速导入，Hbase 的 HFile 无法完成。
+如果 bulk-loading 设置为 false，则会一条一条插入 数据库，使用任何一种 JanusGraph 支持的后端存储都可以。
+
+- 如果配置为 false 会使用 `TxImportStoreImpl` ，会将数据写入 janusgraph，支持所有的存储。
+- 如果配置为 true 会使用 `BulkImportStoreImpl` 就会将数据写为 SSTable，然后需要使用命令行导入cassandra，目前只支持 Cassandra。
 - 注意 cassandra 的 SSTableWriter 有 bug，如果数据量大会出错。
+
+如果有类似的错误： Input error: Could not find implementation class: org.janusgraph.diskstorage.cql.CQLStoreManager。
+很明显是因为你 bulk-loading 设置为 false 然后使用了 CQLStoreManager 写数据，但是没有加入 CQLStoreManager 的依赖。只需要加上即可：
+
+```xml
+<groupId>org.janusgraph</groupId>
+<artifactId>janusgraph-cql</artifactId>
+```

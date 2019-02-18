@@ -78,7 +78,8 @@ public abstract class EntityImporter extends InputEntityVisitor.Adapter {
         }
     };
 
-    protected EntityImporter(int numRunners, // this field is remained to do multi-thread serialize in future edition
+    protected EntityImporter(boolean bulkLoading,
+                             int numRunners, // this field is remained to do multi-thread serialize in future edition
                              int rank,
                              String title,
                              DataImporter.Monitor monitor ,
@@ -92,14 +93,14 @@ public abstract class EntityImporter extends InputEntityVisitor.Adapter {
         this.graph = graph;
         this.stx = (StandardJanusGraphTx) graph.newTransaction();
         this.mgmt = graph.openManagement();
-        if (true) { // FIXME alter this condition to use configuration
-            // TxImportStoreImpl will write data to janusgraph
-            this.janusStore = new ImportStores.TxImportStoreImpl(graph, janusStore.getTable());
-        }else {
+        if (bulkLoading) {
             // BulkImportStoreImpl will write data to SSTable
             this.janusStore = new ImportStores.BulkImportStoreImpl(graph,
                     janusStore.getPath() + File.separator + title + File.separator + rank,
                     janusStore.getKeySpace(),janusStore.getTable());
+        }else {
+            // TxImportStoreImpl will write data to janusgraph
+            this.janusStore = new ImportStores.TxImportStoreImpl(graph, janusStore.getTable());
         }
 
 

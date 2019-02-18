@@ -144,6 +144,7 @@ import static java.util.Arrays.asList;
  *    --skip-bad-edges true \
  *    --ignore-extra-columns true \
  *    --ignore-empty-strings true \
+ *    --bulk-loading true \
  *    --bad-tolerance 10000000 \
  *    --processors 1 \
  *    --id-type string \
@@ -217,6 +218,7 @@ public class BulkLoad {
         }
 
         File storeDir;
+        boolean bulkLoading;
         Number processors;
         long badTolerance;
         boolean skipBadEdges;
@@ -256,6 +258,7 @@ public class BulkLoad {
 
             validateInputFiles( nodesFiles, edgesFiles );
             enableStacktrace = args.getBoolean( Options.STACKTRACE.key(), Boolean.FALSE, Boolean.TRUE );
+            bulkLoading = args.getBoolean(Options.BULK_LOADING.key(), Boolean.FALSE, Boolean.TRUE );
             processors = args.getNumber( Options.PROCESSORS.key(), null );
             idType = args.interpretOption( Options.ID_TYPE.key(),
                     withDefault( (IdType) Options.ID_TYPE.defaultValue() ), TO_ID_TYPE );
@@ -276,7 +279,7 @@ public class BulkLoad {
 
             boolean allowCacheOnHeap = args.getBoolean( Options.CACHE_ON_HEAP.key(),
                     (Boolean) Options.CACHE_ON_HEAP.defaultValue() );
-            configuration = importConfiguration(
+            configuration = importConfiguration(bulkLoading,
                     processors, maxMemory, storeDir,
                     allowCacheOnHeap, defaultHighIO );
 
@@ -616,6 +619,11 @@ public class BulkLoad {
                         + IdType.INTEGER + ": arbitrary integer values for identifying nodes.\n"
                         + IdType.ACTUAL + ": (advanced) actual node ids. The default option is `" + IdType.STRING  +
                         "`.", true ),
+        BULK_LOADING( "bulk-loading", Boolean.FALSE,
+                "<true/false>",
+                "Whether or not to use bulk-loading."
+                        + "if true, will generator SSTable(cassandra) or HFile(Hbase) instead of insert one by one"
+                        + "if false, vertices and edges will be inserted into DB one by one through transaction" ),
         PROCESSORS( "processors", null,
                 "<max processor count>",
                 "(advanced) Max number of processors used by the importer. Defaults to the number of "
@@ -1063,12 +1071,18 @@ public class BulkLoad {
         return UNLIMITED.equals( value ) ? BadCollector.UNLIMITED_TOLERANCE : Long.parseLong( value );
     }
 
-    public static Configuration importConfiguration(
+    public static Configuration importConfiguration(boolean bulkLoading,
             Number processors, Long maxMemory, File storeDir,
             boolean allowCacheOnHeap, Boolean defaultHighIO )
     {
         return new Configuration()
         {
+            @Override
+            public boolean bulkLoading()
+            {
+                return bulkLoading ;
+            }
+
             @Override
             public long pageCacheMemory()
             {
