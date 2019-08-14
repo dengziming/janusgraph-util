@@ -94,3 +94,7 @@ you can add some dependency to pom.xml
 <groupId>org.janusgraph</groupId>
 <artifactId>janusgraph-cql</artifactId>
 ```
+
+# 注意事项
+these code are most copy from neo4j ![http://github.com/Neo4j/neo4j] ,so you can only use it for learn instead of commercial purpose
+代码是从neo4j复制过来进行的修改，所以只能用于学习不能商用
